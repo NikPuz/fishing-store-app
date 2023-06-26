@@ -51,7 +51,7 @@ namespace fishing_store_app
         private void fillCategories()
         {
             Categories = new ObservableCollection<Category>(sharedClient.GetFromJsonAsync<List<Category>>("categories", default).Result);
-            List<string> categories = new List<string>(Categories.Count);
+            ObservableCollection<string> categories = new ObservableCollection<string>();
             CategoriesId = new Dictionary<string, int>();
             for (int i = 0; i < Categories.Count; i++)
             {
@@ -64,7 +64,7 @@ namespace fishing_store_app
         private void fillManufacturers()
         {
             Manufacturers = new ObservableCollection<Manufacturer>(sharedClient.GetFromJsonAsync<List<Manufacturer>>("manufacturers", default).Result);
-            List<string> manufacturers = new List<string>(Manufacturers.Count);
+            ObservableCollection<string> manufacturers = new ObservableCollection<string>();
             ManufacturersId = new Dictionary<string, int>();
             for (int i = 0; i < Manufacturers.Count; i++)
             {
@@ -82,7 +82,7 @@ namespace fishing_store_app
                 return _refreshProducts ??
                 (_refreshProducts = new RelayCommand(obj =>
                 {
-                    Products = new ObservableCollection<Product>(sharedClient.GetFromJsonAsync<List<Product>>("products", default).Result);
+                    fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
             }
@@ -104,10 +104,10 @@ namespace fishing_store_app
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
-                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8);
-                    var response = sharedClient.PostAsync("products", httpContent).Result;
+
+                    sharedClient.PostAsync("products", new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8));
                     Thread.Sleep(5);
-                    Products = new ObservableCollection<Product>(sharedClient.GetFromJsonAsync<List<Product>>("products", default).Result);
+                    fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
             }
@@ -130,10 +130,10 @@ namespace fishing_store_app
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
-                    HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8);
-                    var response = sharedClient.PutAsync("products", httpContent).Result;
+
+                    sharedClient.PutAsync("products", new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8));
                     Thread.Sleep(5);
-                    Products = new ObservableCollection<Product>(sharedClient.GetFromJsonAsync<List<Product>>("products", default).Result);
+                    fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
             }
@@ -149,7 +149,7 @@ namespace fishing_store_app
                 {
                     sharedClient.DeleteAsync("products/" + SelectedProduct.Id);
                     Thread.Sleep(5);
-                    Products = new ObservableCollection<Product>(sharedClient.GetFromJsonAsync<List<Product>>("products", default).Result);
+                    fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
             }
@@ -229,8 +229,8 @@ namespace fishing_store_app
             }
         }
 
-        private List<string> _cBProductCategory;
-        public List<string> CBProductCategory
+        private ObservableCollection<string> _cBProductCategory;
+        public ObservableCollection<string> CBProductCategory
         {
             get { return _cBProductCategory; }
             set
@@ -240,13 +240,223 @@ namespace fishing_store_app
             }
         }
 
-        private List<string> _cBProductManufacturer;
-        public List<string> CBProductManufacturer
+        private ObservableCollection<string> _cBProductManufacturer;
+        public ObservableCollection<string> CBProductManufacturer
         {
             get { return _cBProductManufacturer; }
             set
             {
                 _cBProductManufacturer = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand _refreshCategories;
+        public RelayCommand RefreshCategories
+        {
+            get
+            {
+                return _refreshCategories ??
+                (_refreshCategories = new RelayCommand(obj =>
+                {
+                    fillCategories();
+                    NotifyPropertyChanged("Categories");
+                }));
+            }
+        }
+
+        private RelayCommand _createCategory;
+        public RelayCommand CreateCategory
+        {
+            get
+            {
+                return _createCategory ??
+                (_createCategory = new RelayCommand(obj =>
+                {
+                    var category = new Category
+                    {
+                        Name = TBCategoryName
+                    };
+
+                    sharedClient.PostAsync("categories", new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8));
+                    Thread.Sleep(5);
+                    fillCategories();
+                    NotifyPropertyChanged("Categories");
+                }));
+            }
+        }
+
+        private RelayCommand _updateCategory;
+        public RelayCommand UpdateCategory
+        {
+            get
+            {
+                return _updateCategory ??
+                (_updateCategory = new RelayCommand(obj =>
+                {
+                    var category = new Category
+                    {
+                        Id = SelectedCategory.Id,
+                        Name = TBCategoryName
+                    };
+
+                    sharedClient.PutAsync("categories", new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8));
+                    Thread.Sleep(5);
+                    fillCategories();
+                    NotifyPropertyChanged("Categories");
+                }));
+            }
+        }
+
+        private RelayCommand _deleteCategory;
+        public RelayCommand DeleteCategory
+        {
+            get
+            {
+                return _deleteCategory ??
+                (_deleteCategory = new RelayCommand(obj =>
+                {
+                    if (SelectedCategory.Id != 0)
+                    {
+                        sharedClient.DeleteAsync("categories/" + SelectedCategory.Id);
+                        Thread.Sleep(5);
+                        fillCategories();
+                        fillProducts();
+                        NotifyPropertyChanged("Categories");
+                        NotifyPropertyChanged("Products");
+                    }
+                }));
+            }
+        }
+
+        private Category _selectedCategory;
+        public Category SelectedCategory
+        {
+            get { return _selectedCategory; }
+            set
+            {
+                if (value != null)
+                {
+                    TBCategoryName = value.Name;
+
+                    _selectedCategory = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private string _tBCategoryName;
+        public string TBCategoryName
+        {
+            get { return _tBCategoryName; }
+            set
+            {
+                _tBCategoryName = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand _refreshManufacturers;
+        public RelayCommand RefreshManufacturers
+        {
+            get
+            {
+                return _refreshManufacturers ??
+                (_refreshManufacturers = new RelayCommand(obj =>
+                {
+                    fillManufacturers();
+                    NotifyPropertyChanged("Manufacturers");
+                }));
+            }
+        }
+
+        private RelayCommand _createManufacturer;
+        public RelayCommand CreateManufacturer
+        {
+            get
+            {
+                return _createManufacturer ??
+                (_createManufacturer = new RelayCommand(obj =>
+                {
+                    var manufacturer = new Manufacturer
+                    {
+                        Name = TBManufacturerName
+                    };
+
+                    sharedClient.PostAsync("manufacturers", new StringContent(JsonConvert.SerializeObject(manufacturer), Encoding.UTF8));
+                    Thread.Sleep(5);
+                    fillManufacturers();
+                    NotifyPropertyChanged("Manufacturers");
+                }));
+            }
+        }
+
+        private RelayCommand _updateManufacturer;
+        public RelayCommand UpdateManufacturer
+        {
+            get
+            {
+                return _updateManufacturer ??
+                (_updateManufacturer = new RelayCommand(obj =>
+                {
+                    var manufacturer = new Manufacturer
+                    {
+                        Id = SelectedManufacturer.Id,
+                        Name = TBManufacturerName
+                    };
+
+                    sharedClient.PutAsync("manufacturers", new StringContent(JsonConvert.SerializeObject(manufacturer), Encoding.UTF8));
+                    Thread.Sleep(5);
+                    fillManufacturers();
+                    NotifyPropertyChanged("Manufacturers");
+                }));
+            }
+        }
+
+        private RelayCommand _deleteManufacturer;
+        public RelayCommand DeleteManufacturer
+        {
+            get
+            {
+                return _deleteManufacturer ??
+                (_deleteManufacturer = new RelayCommand(obj =>
+                {
+                    if (SelectedManufacturer.Id != 0)
+                    {
+                        sharedClient.DeleteAsync("manufacturers/" + SelectedManufacturer.Id);
+                        Thread.Sleep(5);
+                        fillManufacturers();
+                        fillProducts();
+                        NotifyPropertyChanged("Manufacturers");
+                        NotifyPropertyChanged("Products");
+                    }
+                }));
+            }
+        }
+
+        private Manufacturer _selectedManufacturer;
+        public Manufacturer SelectedManufacturer
+        {
+            get { return _selectedManufacturer; }
+            set
+            {
+                if (value != null)
+                {
+                    TBManufacturerName = value.Name;
+
+                    _selectedManufacturer = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private string _tBManufacturerName;
+        public string TBManufacturerName
+        {
+            get { return _tBManufacturerName; }
+            set
+            {
+                _tBManufacturerName = value;
                 NotifyPropertyChanged();
             }
         }

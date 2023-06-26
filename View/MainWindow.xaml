@@ -13,17 +13,17 @@
             <Setter Property="Padding" Value="5,3,5,5" />
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Width" Value="100" />
-            <Setter Property="Margin" Value="5,2,5,2" />
+            <Setter Property="Width" Value="125" />
+            <Setter Property="Margin" Value="3,2,5,2" />
         </Style>
         <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="5,2,5,2" />
+            <Setter Property="Margin" Value="5,2,0,2" />
         </Style>
         <Style TargetType="GroupBox">
             <Setter Property="Margin" Value="2,2,2,2" />
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="5,0,5,2" />
+            <Setter Property="Margin" Value="3,0,5,2" />
         </Style>
         <Style TargetType="CheckBox">
             <Setter Property="Margin" Value="5,2,5,2" />
@@ -50,7 +50,7 @@
                             </Grid.RowDefinitions>
 
                             <DataGrid Grid.Row="0" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
-                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False">
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
@@ -72,11 +72,11 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock>Цена:</TextBlock>
-                                        <TextBox Width="30" Text="{Binding TBProductPrice, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                        <TextBox Width="40" Text="{Binding TBProductPrice, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock>Кол-во:</TextBlock>
-                                        <TextBox Width="30" Text="{Binding TBProductStock, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                        <TextBox Width="40" Text="{Binding TBProductStock, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock>Категория:</TextBlock>
@@ -98,7 +98,7 @@
                                         <Button Command="{Binding UpdateProduct}" HorizontalAlignment="Left">Изменить</Button>
                                         <Button Command="{Binding DeleteProduct}" HorizontalAlignment="Left">Удалить</Button>
                                     </StackPanel>
-                                    <Button x:Name="RefreshProductsButton" Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                    <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -109,7 +109,44 @@
                         <TextBlock Text="Категории" />
                     </TabItem.Header>
                     <TabItem.Content>
-                        <TextBlock Text="Tab2 content" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <WrapPanel Grid.Row="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Название:</TextBlock>
+                                        <TextBox Text="{Binding TBCategoryName, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Command="{Binding CreateCategory}" HorizontalAlignment="Left">Добавить</Button>
+                                        <Button Command="{Binding UpdateCategory}" HorizontalAlignment="Left">Изменить</Button>
+                                        <Button Command="{Binding DeleteCategory}" HorizontalAlignment="Left">Удалить</Button>
+                                    </StackPanel>
+                                    <Button Command="{Binding RefreshCategories}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem>
@@ -117,7 +154,44 @@
                         <TextBlock Text="Производители" />
                     </TabItem.Header>
                     <TabItem.Content>
-                        <TextBlock Text="Tab3 content" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Manufacturers}" SelectedItem="{Binding SelectedManufacturer}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <WrapPanel Grid.Row="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Название:</TextBlock>
+                                        <TextBox Text="{Binding TBManufacturerName, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Command="{Binding CreateManufacturer}" HorizontalAlignment="Left">Добавить</Button>
+                                        <Button Command="{Binding UpdateManufacturer}" HorizontalAlignment="Left">Изменить</Button>
+                                        <Button Command="{Binding DeleteManufacturer}" HorizontalAlignment="Left">Удалить</Button>
+                                    </StackPanel>
+                                    <Button Command="{Binding RefreshManufacturers}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem>
