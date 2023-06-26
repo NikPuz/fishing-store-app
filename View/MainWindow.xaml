@@ -1,0 +1,142 @@
+﻿<Window x:Class="fishing_store_app.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="900">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="35" />
+            <Setter Property="MinHeight" Value="15" />
+            <Setter Property="Margin" Value="5,5,5,5" />
+            <Setter Property="Padding" Value="5,3,5,5" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Margin" Value="5,2,5,2" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5,2,5,2" />
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="2,2,2,2" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="5,0,5,2" />
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="5,2,5,2" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Border x:Name="test" Width="auto">
+            <TabControl TabStripPlacement="Left">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem" >
+                        <Setter Property="Height" Value="50" />
+                        <Setter Property="Width" Value="125" />
+                    </Style>
+                </TabControl.Resources>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Продукты" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
+                                    <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                                    <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <WrapPanel Grid.Row="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Название:</TextBlock>
+                                        <TextBox Text="{Binding TBProductName, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Цена:</TextBlock>
+                                        <TextBox Width="30" Text="{Binding TBProductPrice, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Кол-во:</TextBlock>
+                                        <TextBox Width="30" Text="{Binding TBProductStock, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Категория:</TextBlock>
+                                        <ComboBox Width="100" ItemsSource="{Binding CBProductCategory}" SelectedItem="{Binding SelectedCBProductCategory, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Производитель:</TextBlock>
+                                        <ComboBox Width="100" ItemsSource="{Binding CBProductManufacturer}" SelectedItem="{Binding SelectedCBProductManufacturer, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Command="{Binding CreateProduct}" HorizontalAlignment="Left">Добавить</Button>
+                                        <Button Command="{Binding UpdateProduct}" HorizontalAlignment="Left">Изменить</Button>
+                                        <Button Command="{Binding DeleteProduct}" HorizontalAlignment="Left">Удалить</Button>
+                                    </StackPanel>
+                                    <Button x:Name="RefreshProductsButton" Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Категории" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <TextBlock Text="Tab2 content" />
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Производители" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <TextBlock Text="Tab3 content" />
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Поставки" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <TextBlock Text="Tab4 content" />
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Штрихкоды" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <TextBlock Text="Tab5 content" />
+                    </TabItem.Content>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </Grid>
+</Window>

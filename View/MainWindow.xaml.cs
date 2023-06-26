@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Caliburn.Micro;
+using fishing_store_app.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,11 +25,8 @@ namespace fishing_store_app
         public MainWindow()
         {
             InitializeComponent();
-        }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-
+            DataContext = new ViewModel();
         }
     }
 }

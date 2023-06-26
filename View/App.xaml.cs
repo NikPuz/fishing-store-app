@@ -13,5 +13,12 @@ namespace fishing_store_app
     /// </summary>
     public partial class App : Application
     {
+        [STAThread()]
+        static void Main()
+        {
+            App app = new();
+            app.InitializeComponent();
+            app.Run();
+        }
     }
 }
