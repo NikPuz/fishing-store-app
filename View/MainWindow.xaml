@@ -199,7 +199,126 @@
                         <TextBlock Text="Поставки" />
                     </TabItem.Header>
                     <TabItem.Content>
-                        <TextBlock Text="Tab4 content" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <DataGrid Grid.Row="0" ItemsSource="{Binding Supplies}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                    RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding ProductName}"/>
+                                        <DataGridTextColumn Header="Category" Binding="{Binding ProductCategory}"/>
+                                        <DataGridTextColumn Header="Manufacturer" Binding="{Binding ProductManufacturer}"/>
+                                        <DataGridTextColumn Header="UnitPrice" Binding="{Binding UnitPrice}"/>
+                                        <DataGridTextColumn Header="Count" Binding="{Binding Count}"/>
+                                        <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <WrapPanel Grid.Row="0">
+                                    </WrapPanel>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Command="{Binding RefreshSuppies}" VerticalAlignment="Top">Обновить</Button>
+                                        </StackPanel>
+                                    
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <DataGrid Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedSupplyProduct}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                                    <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1" Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <WrapPanel Grid.Row="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Название:</TextBlock>
+                                        <TextBlock Width="125" Text="{Binding TBSupplyProductName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                    <TextBlock>Категория:</TextBlock>
+                                        <TextBlock Width="125" Text="{Binding TBSupplyProductCategory, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                    <TextBlock>Производитель:</TextBlock>
+                                        <TextBlock Width="125" Text="{Binding TBSupplyProductManufacturer, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Количество:</TextBlock>
+                                        <TextBox Width="125" Text="{Binding TBSupplyProductCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Цена за ед.:</TextBlock>
+                                        <TextBox Width="50" Text="{Binding TBSupplyProductUnitPrice, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Command="{Binding CreateSupply}">Поставить</Button>
+                                    </StackPanel>
+                                    <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="5,0,0,0">Обновить</Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Продажи" />
+                    </TabItem.Header>
+                    <TabItem.Content>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <DataGrid Grid.Row="0" ItemsSource="{Binding Manufacturers}" SelectedItem="{Binding SelectedManufacturer}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1">
+                                <Button Command="{Binding RefreshSales}" Grid.Column="0" HorizontalAlignment="Center">Обновить</Button>
+                            </Grid>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
                 <TabItem>

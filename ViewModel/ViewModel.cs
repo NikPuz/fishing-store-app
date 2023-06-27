@@ -1,4 +1,5 @@
-﻿using fishing_store_app.Model;
+﻿using Caliburn.Micro;
+using fishing_store_app.Model;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -16,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace fishing_store_app
 {
@@ -26,6 +28,8 @@ namespace fishing_store_app
         public ObservableCollection<Category> Categories { get; set; }
 
         public ObservableCollection<Manufacturer> Manufacturers { get; set; }
+        
+        public ObservableCollection<Supply> Supplies { get; set; }
 
         private Dictionary<string, int> CategoriesId { get; set; }
 
@@ -41,6 +45,7 @@ namespace fishing_store_app
             fillProducts();
             fillCategories();
             fillManufacturers();
+            fillSupplies();
         }
 
         private void fillProducts()
@@ -72,6 +77,11 @@ namespace fishing_store_app
                 ManufacturersId[Manufacturers[i].Name] = Manufacturers[i].Id;
             }
             CBProductManufacturer = manufacturers;
+        }
+
+        private void fillSupplies()
+        {
+            Supplies = new ObservableCollection<Supply>(sharedClient.GetFromJsonAsync<List<Supply>>("supplies", default).Result);
         }
 
         private RelayCommand _refreshProducts;
@@ -457,6 +467,118 @@ namespace fishing_store_app
             set
             {
                 _tBManufacturerName = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand _refreshSuppies;
+        public RelayCommand RefreshSuppies
+        {
+            get
+            {
+                return _refreshSuppies ??
+                (_refreshSuppies = new RelayCommand(obj =>
+                {
+                    fillSupplies();
+                    NotifyPropertyChanged("Suppies");
+                }));
+            }
+        }
+
+
+        private Product _selectedSupplyProduct;
+        public Product SelectedSupplyProduct
+        {
+            get { return _selectedSupplyProduct; }
+            set
+            {
+                if (value != null)
+                {
+                    TBSupplyProductName = value.Name;
+                    TBSupplyProductCategory = value.Category;
+                    TBSupplyProductManufacturer = value.Manufacturer;
+
+                    _selectedSupplyProduct = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private RelayCommand _createSupply;
+        public RelayCommand CreateSupply
+        {
+            get
+            {
+                return _createSupply ??
+                (_createSupply = new RelayCommand(obj =>
+                {
+                    var supply = new RequestSupply
+                    {
+                        ProductId = SelectedSupplyProduct.Id,
+                        UnitPrice = TBSupplyProductUnitPrice,
+                        Count = TBSupplyProductCount,
+                        Date = null
+                    };
+
+                    sharedClient.PostAsync("supplies", new StringContent(JsonConvert.SerializeObject(supply), Encoding.UTF8));
+                    Thread.Sleep(5);
+                    fillSupplies();
+                    NotifyPropertyChanged("Supplies");
+                }));
+            }
+        }
+
+        private string _tBSupplyProductName;
+        public string TBSupplyProductName
+        {
+            get { return _tBSupplyProductName; }
+            set
+            {
+                _tBSupplyProductName = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string _tBSupplyProductCategory;
+        public string TBSupplyProductCategory
+        {
+            get { return _tBSupplyProductCategory; }
+            set
+            {
+                _tBSupplyProductCategory = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string _tBSupplyProductManufacturer;
+        public string TBSupplyProductManufacturer
+        {
+            get { return _tBSupplyProductManufacturer; }
+            set
+            {
+                _tBSupplyProductManufacturer = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _tBSupplyProductCount;
+        public int TBSupplyProductCount
+        {
+            get { return _tBSupplyProductCount; }
+            set
+            {
+                _tBSupplyProductCount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _tBSupplyProductUnitPrice;
+        public int TBSupplyProductUnitPrice
+        {
+            get { return _tBSupplyProductUnitPrice; }
+            set
+            {
+                _tBSupplyProductUnitPrice = value;
                 NotifyPropertyChanged();
             }
         }
