@@ -30,6 +30,10 @@ namespace fishing_store_app
         public ObservableCollection<Manufacturer> Manufacturers { get; set; }
         
         public ObservableCollection<Supply> Supplies { get; set; }
+        
+        public ObservableCollection<Sale> Sales { get; set; }
+
+        public ObservableCollection<SaleItem> SaleItems { get; set; }
 
         private Dictionary<string, int> CategoriesId { get; set; }
 
@@ -45,7 +49,7 @@ namespace fishing_store_app
             fillProducts();
             fillCategories();
             fillManufacturers();
-            fillSupplies();
+            fillSales();
         }
 
         private void fillProducts()
@@ -82,6 +86,11 @@ namespace fishing_store_app
         private void fillSupplies()
         {
             Supplies = new ObservableCollection<Supply>(sharedClient.GetFromJsonAsync<List<Supply>>("supplies", default).Result);
+        }
+
+        private void fillSales()
+        {
+            Sales = new ObservableCollection<Sale>(sharedClient.GetFromJsonAsync<List<Sale>>("sales", default).Result);
         }
 
         private RelayCommand _refreshProducts;
@@ -580,6 +589,39 @@ namespace fishing_store_app
             {
                 _tBSupplyProductUnitPrice = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        private RelayCommand _refreshSales;
+        public RelayCommand RefreshSales
+        {
+            get
+            {
+                return _refreshSales ??
+                (_refreshSales = new RelayCommand(obj =>
+                {
+                    fillSales();
+                    NotifyPropertyChanged("Sales");
+                }));
+            }
+        }
+
+        private Sale _selectedSale;
+        public Sale SelectedSale
+        {
+            get { return _selectedSale; }
+            set
+            {
+                if (value != null)
+                {
+                    if (value != null)
+                    {
+                        _selectedSale = value;
+                        SaleItems = new ObservableCollection<SaleItem>(value.SaleItems);
+                        NotifyPropertyChanged("SaleItems");
+                        NotifyPropertyChanged();
+                    }
+                }
             }
         }
 
