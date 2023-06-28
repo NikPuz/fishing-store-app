@@ -90,15 +90,15 @@
                                 <Grid Grid.Row="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Command="{Binding CreateProduct}" HorizontalAlignment="Left">Добавить</Button>
                                         <Button Command="{Binding UpdateProduct}" HorizontalAlignment="Left">Изменить</Button>
                                         <Button Command="{Binding DeleteProduct}" HorizontalAlignment="Left">Удалить</Button>
                                     </StackPanel>
-                                    <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                    <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="5,0,0,0">Обновить</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -242,7 +242,7 @@
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Button Command="{Binding RefreshSuppies}" VerticalAlignment="Top">Обновить</Button>
                                         </StackPanel>
-                                    
+
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -265,11 +265,11 @@
                                         <TextBlock Width="125" Text="{Binding TBSupplyProductName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                    <TextBlock>Категория:</TextBlock>
+                                        <TextBlock>Категория:</TextBlock>
                                         <TextBlock Width="125" Text="{Binding TBSupplyProductCategory, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                    <TextBlock>Производитель:</TextBlock>
+                                        <TextBlock>Производитель:</TextBlock>
                                         <TextBlock Width="125" Text="{Binding TBSupplyProductManufacturer, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
@@ -339,7 +339,85 @@
                         <TextBlock Text="Штрихкоды" />
                     </TabItem.Header>
                     <TabItem.Content>
-                        <TextBlock Text="Tab5 content" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <DataGrid Grid.Row="0" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedBarcodeProduct}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                                        <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
+                                        <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
+                                        <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <WrapPanel Grid.Row="0">
+                                    </WrapPanel>
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock >Количество:</TextBlock>
+                                            <TextBox Text="{Binding TBBarcodeCount, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                        </StackPanel>
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Command="{Binding AddToPrintings}" HorizontalAlignment="Left">Добавить</Button>
+                                            </StackPanel>
+                                            <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="5,0,0,0">Обновить</Button>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <DataGrid Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Printings}" SelectedItem="{Binding SelectedPrinting}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Product.Name}"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <Grid Grid.Row="1" Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Command="{Binding Printing}">Распечатать</Button>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Command="{Binding DeletePrinting}">Удалить</Button>
+                                    <Button Command="{Binding ClearPrintings}">Отчистить</Button>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
                     </TabItem.Content>
                 </TabItem>
             </TabControl>

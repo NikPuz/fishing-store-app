@@ -1,23 +1,25 @@
-﻿using Caliburn.Micro;
-using fishing_store_app.Model;
+﻿using fishing_store_app.Model;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+using Microsoft.Win32;
 using Newtonsoft.Json;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Xml.Linq;
+using Image = iTextSharp.text.Image;
+using Paragraph = iTextSharp.text.Paragraph;
+using IronBarCode;
 
 namespace fishing_store_app
 {
@@ -34,6 +36,8 @@ namespace fishing_store_app
         public ObservableCollection<Sale> Sales { get; set; }
 
         public ObservableCollection<SaleItem> SaleItems { get; set; }
+        
+        public ObservableCollection<Printing> Printings { get; set; }
 
         private Dictionary<string, int> CategoriesId { get; set; }
 
@@ -46,10 +50,12 @@ namespace fishing_store_app
 
         public ViewModel()
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             fillProducts();
             fillCategories();
             fillManufacturers();
             fillSales();
+            TBBarcodeCount = 1;
         }
 
         private void fillProducts()
@@ -232,8 +238,11 @@ namespace fishing_store_app
             get { return _selectedCBProductCategory; }
             set
             {
-                _selectedCBProductCategory = value;
-                NotifyPropertyChanged();
+                if (value != null)
+                {
+                    _selectedCBProductCategory = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
@@ -243,8 +252,11 @@ namespace fishing_store_app
             get { return _selectedCBProductManufacturer; }
             set
             {
-                _selectedCBProductManufacturer = value;
-                NotifyPropertyChanged();
+                if (value != null)
+                {
+                    _selectedCBProductManufacturer = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
@@ -622,6 +634,163 @@ namespace fishing_store_app
                         NotifyPropertyChanged();
                     }
                 }
+            }
+        }
+
+        private Product _selectedBarcodeProduct;
+        public Product SelectedBarcodeProduct
+        {
+            get { return _selectedBarcodeProduct; }
+            set
+            {
+                if (value != null)
+                {
+                    
+                    _selectedBarcodeProduct = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private int _tBBarcodeCount;
+        public int TBBarcodeCount
+        {
+            get { return _tBBarcodeCount; }
+            set
+            {
+                _tBBarcodeCount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private Printing _selectedPrinting;
+        public Printing SelectedPrinting
+        {
+            get { return _selectedPrinting; }
+            set
+            {
+                if (value != null)
+                {
+
+                    _selectedPrinting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private RelayCommand _addToPrintings;
+        public RelayCommand AddToPrintings
+        {
+            get
+            {
+                return _addToPrintings ??
+                (_addToPrintings = new RelayCommand(obj =>
+                {
+
+                    var printing = new Printing
+                    {
+                        Product = SelectedBarcodeProduct,
+                        Count = TBBarcodeCount
+                    };
+
+                    if (Printings != null)
+                    {
+                        Printings.Add(printing);
+                    } else
+                    {
+                        Printings = new ObservableCollection<Printing>() { printing };
+                    }
+                    
+                    NotifyPropertyChanged("Printings");
+                }));
+            }
+        }
+
+        private RelayCommand _deletePrinting;
+        public RelayCommand DeletePrinting
+        {
+            get
+            {
+                return _deletePrinting ??
+                (_deletePrinting = new RelayCommand(obj =>
+                {
+
+                    Printings.Remove(SelectedPrinting);
+                    NotifyPropertyChanged("Printings");
+                }));
+            }
+        }
+
+        private RelayCommand _clearPrintings;
+        public RelayCommand ClearPrintings
+        {
+            get
+            {
+                return _clearPrintings ??
+                (_clearPrintings = new RelayCommand(obj =>
+                {
+
+                    Printings = new ObservableCollection<Printing>();
+                    NotifyPropertyChanged("Printings");
+                }));
+            }
+        }
+
+        private RelayCommand _printing;
+        public RelayCommand Printing
+        {
+            get
+            {
+                return _printing ??
+                (_printing = new RelayCommand(obj =>
+                {
+                    var barcode = new BarcodeLib.Barcode();
+
+                    var saveFileDialog = new SaveFileDialog { FileName = "Barcodes", Filter = "PDF file (*.pdf)|*.pdf" };
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        var document = new Document();
+
+                        var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                        PdfWriter.GetInstance(document, fileStream);
+
+                        // Для отображения русских букв
+                        var baseFont = BaseFont.CreateFont(@"C:\Windows\Fonts\Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                        var font = new iTextSharp.text.Font(baseFont, 14);
+
+                        document.Open();
+
+                        foreach (var item in Printings)
+                        {
+                            var cuntryCode = "460";
+                            var manufacturerCode = ManufacturersId[item.Product.Manufacturer].ToString();
+                            var productCode = item.Product.Id.ToString();
+                            for (var i = 1; manufacturerCode.Length < 4; i++)
+                            {
+                                manufacturerCode = "0" + manufacturerCode;
+                            }
+
+                            for (var i = 1; productCode.Length < 5; i++)
+                            {
+                                productCode = "0" + productCode;
+                            }
+                            var itemBarcode = cuntryCode + manufacturerCode + productCode;
+                            var imageBarcode = BarcodeWriter.CreateBarcode(itemBarcode, BarcodeEncoding.EAN13).ToImage();
+                            //var imageBarcode = barcode.Encode(BarcodeLib.TYPE.EAN13, itemBarcode, Color.Black, Color.White, 290, 120);
+
+                            var image = Image.GetInstance(imageBarcode, ImageFormat.Jpeg);
+
+                            document.Add(new Paragraph(item.Product.Name, font));
+                            document.Add(image);
+                        }
+
+                        document.Close();
+                        // Открытие созданного файла
+                        //System.Diagnostics.Process.Start(saveFileDialog.FileName);
+                    }
+                }));
             }
         }
 
