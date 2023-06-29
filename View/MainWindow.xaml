@@ -405,14 +405,25 @@
                             <Grid Grid.Row="1" Grid.Column="2">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <WrapPanel Grid.Row="0" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Ширина:</TextBlock>
+                                        <TextBox Width="50" Text="{Binding TBPrintDpi, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Высота:</TextBlock>
+                                        <TextBox Width="50" Text="{Binding TBPrintBarcodeHeight, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                </WrapPanel>
+                                <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Command="{Binding Printing}">Распечатать</Button>
                                     </StackPanel>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                                     <Button Command="{Binding DeletePrinting}">Удалить</Button>
                                     <Button Command="{Binding ClearPrintings}">Отчистить</Button>
                                 </StackPanel>

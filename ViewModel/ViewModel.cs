@@ -1,13 +1,11 @@
 ﻿using fishing_store_app.Model;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net.Http;
@@ -15,11 +13,10 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Image = iTextSharp.text.Image;
-using Paragraph = iTextSharp.text.Paragraph;
-using IronBarCode;
+using Barcoded;
+using System.Diagnostics;
 
 namespace fishing_store_app
 {
@@ -56,6 +53,8 @@ namespace fishing_store_app
             fillManufacturers();
             fillSales();
             TBBarcodeCount = 1;
+            TBPrintDpi = 300;
+            TBPrintBarcodeHeight = 100;
         }
 
         private void fillProducts()
@@ -706,6 +705,28 @@ namespace fishing_store_app
             }
         }
 
+        private int _tBPrintDpi;
+        public int TBPrintDpi
+        {
+            get { return _tBPrintDpi; }
+            set
+            {
+                _tBPrintDpi = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _tBPrintBarcodeHeight;
+        public int TBPrintBarcodeHeight
+        {
+            get { return _tBPrintBarcodeHeight; }
+            set
+            {
+                _tBPrintBarcodeHeight = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private RelayCommand _deletePrinting;
         public RelayCommand DeletePrinting
         {
@@ -744,52 +765,59 @@ namespace fishing_store_app
                 return _printing ??
                 (_printing = new RelayCommand(obj =>
                 {
-                    var barcode = new BarcodeLib.Barcode();
 
-                    var saveFileDialog = new SaveFileDialog { FileName = "Barcodes", Filter = "PDF file (*.pdf)|*.pdf" };
+                    //var saveFileDialog = new SaveFileDialog { FileName = "Barcodes", Filter = "PDF file (*.pdf)|*.pdf" };
 
-                    if (saveFileDialog.ShowDialog() == true)
+                    var document = new Document();
+
+                    var fileStream = new FileStream("Barcodes.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
+
+                    PdfWriter.GetInstance(document, fileStream);
+
+                    // Для отображения русских букв
+                    //var baseFont = BaseFont.CreateFont(@"C:\Windows\Fonts\Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                    //var font = new iTextSharp.text.Font(baseFont, 14);
+
+                    document.Open();
+
+                    foreach (var item in Printings)
                     {
-                        var document = new Document();
-
-                        var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.None);
-
-                        PdfWriter.GetInstance(document, fileStream);
-
-                        // Для отображения русских букв
-                        var baseFont = BaseFont.CreateFont(@"C:\Windows\Fonts\Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                        var font = new iTextSharp.text.Font(baseFont, 14);
-
-                        document.Open();
-
-                        foreach (var item in Printings)
+                        var cuntryCode = "460";
+                        var manufacturerCode = ManufacturersId[item.Product.Manufacturer].ToString();
+                        var productCode = item.Product.Id.ToString();
+                        for (var i = 1; manufacturerCode.Length < 4; i++)
                         {
-                            var cuntryCode = "460";
-                            var manufacturerCode = ManufacturersId[item.Product.Manufacturer].ToString();
-                            var productCode = item.Product.Id.ToString();
-                            for (var i = 1; manufacturerCode.Length < 4; i++)
-                            {
-                                manufacturerCode = "0" + manufacturerCode;
-                            }
-
-                            for (var i = 1; productCode.Length < 5; i++)
-                            {
-                                productCode = "0" + productCode;
-                            }
-                            var itemBarcode = cuntryCode + manufacturerCode + productCode;
-                            var imageBarcode = BarcodeWriter.CreateBarcode(itemBarcode, BarcodeEncoding.EAN13).ToImage();
-                            //var imageBarcode = barcode.Encode(BarcodeLib.TYPE.EAN13, itemBarcode, Color.Black, Color.White, 290, 120);
-
-                            var image = Image.GetInstance(imageBarcode, ImageFormat.Jpeg);
-
-                            document.Add(new Paragraph(item.Product.Name, font));
-                            document.Add(image);
+                            manufacturerCode = "0" + manufacturerCode;
                         }
 
-                        document.Close();
-                        // Открытие созданного файла
-                        //System.Diagnostics.Process.Start(saveFileDialog.FileName);
+                        for (var i = 1; productCode.Length < 5; i++)
+                        {
+                            productCode = "0" + productCode;
+                        }
+                        var itemBarcode = cuntryCode + manufacturerCode + productCode;
+
+                        LinearBarcode newBarcode = new LinearBarcode(itemBarcode, Symbology.Ean13)
+                        {
+                            Encoder =
+                            {
+                                Dpi = TBPrintDpi,
+                                BarcodeHeight = TBPrintBarcodeHeight,
+                            }
+                        };
+
+                        var image = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
+                        image.ScalePercent(50);
+
+                        //document.Add(new Paragraph(item.Product.Name, font));
+                        for (var i = 0; i < item.Count; i++)
+                        {
+                            document.Add(image);
+                        }
                     }
+
+                    document.Close();
+
+                    Process.Start(new ProcessStartInfo("Barcodes.pdf") { UseShellExecute = true });
                 }));
             }
         }
