@@ -17,6 +17,15 @@ using System.Windows.Input;
 using Image = iTextSharp.text.Image;
 using Barcoded;
 using System.Diagnostics;
+using System.Runtime.Serialization;
+using System.Drawing;
+using Rectangle = iTextSharp.text.Rectangle;
+using Font = System.Drawing.Font;
+using PdfSharp.Drawing;
+using Aspose.Pdf;
+using Color = System.Drawing.Color;
+using Document = iTextSharp.text.Document;
+using SixLabors.ImageSharp.Processing;
 
 namespace fishing_store_app
 {
@@ -54,7 +63,8 @@ namespace fishing_store_app
             fillSales();
             TBBarcodeCount = 1;
             TBPrintDpi = 300;
-            TBPrintBarcodeHeight = 100;
+            TBPrintBarcodeHeight = 300;
+            TBScalePercent = 100;
         }
 
         private void fillProducts()
@@ -715,7 +725,7 @@ namespace fishing_store_app
                 NotifyPropertyChanged();
             }
         }
-
+        
         private int _tBPrintBarcodeHeight;
         public int TBPrintBarcodeHeight
         {
@@ -723,6 +733,17 @@ namespace fishing_store_app
             set
             {
                 _tBPrintBarcodeHeight = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _tBScalePercent;
+        public int TBScalePercent
+        {
+            get { return _tBScalePercent; }
+            set
+            {
+                _tBScalePercent = value;
                 NotifyPropertyChanged();
             }
         }
@@ -765,6 +786,9 @@ namespace fishing_store_app
                 return _printing ??
                 (_printing = new RelayCommand(obj =>
                 {
+                    if (Printings == null || Printings.Count == 0) {
+                        return;
+                    }
 
                     //var saveFileDialog = new SaveFileDialog { FileName = "Barcodes", Filter = "PDF file (*.pdf)|*.pdf" };
 
@@ -800,14 +824,47 @@ namespace fishing_store_app
                         {
                             Encoder =
                             {
-                                Dpi = TBPrintDpi,
-                                BarcodeHeight = TBPrintBarcodeHeight,
+                                Dpi = 100,
+                                BarcodeHeight = TBPrintDpi
                             }
                         };
 
-                        var image = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
-                        image.ScalePercent(50);
+                        //var image = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
+                        //image.ScalePercent(TBScalePercent);
+                        //System.Drawing.Image img = System.Drawing.Image.FromStream(new MemoryStream(image.RawData));
+                        //var img = System.Drawing.Image.FromStream(new MemoryStream(image.RawData));
+                        //Graphics g = Graphics.FromImage(img);
+                        //Bitmap b = new Bitmap(newBarcode.Image.Width, newBarcode.Image.Height);
+                        //var g = Graphics.FromImage(b);
+                        //g.DrawString(item.Product.Name, font, color, 17, 2);
 
+                        Bitmap bmp = new Bitmap(TBPrintDpi, newBarcode.Image.Height);
+                        bmp.SetResolution(100, 100);
+                        Graphics graph = Graphics.FromImage(bmp);
+                        System.Drawing.Rectangle ImageSize = new System.Drawing.Rectangle(0, 0, TBPrintDpi, newBarcode.Image.Height);
+                        graph.FillRectangle(Brushes.White, ImageSize);
+                        
+                        var barcodeImage = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
+                        barcodeImage.ScalePercent(TBScalePercent);
+                        graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), 0, newBarcode.Image.Height/3*2);
+                        Font font = new Font("Times New Roman", 6);
+                        SolidBrush color = new SolidBrush(Color.Yellow);
+                        
+                        var textBounds = graph.VisibleClipBounds;
+                        textBounds.Inflate(-5, -5);
+
+                        //graph.DrawString(
+                        //    item.Product.Name,
+                        //    font,
+                        //    Brushes.Yellow,
+                        //    textBounds
+                        //);
+
+                        var image = Image.GetInstance(bmp, ImageFormat.Bmp);
+                        image.Border = Rectangle.BOX;
+                        image.BorderColor = BaseColor.GRAY;
+                        image.BorderWidth = 3f;
+                        image.SpacingBefore = 10f;
                         //document.Add(new Paragraph(item.Product.Name, font));
                         for (var i = 0; i < item.Count; i++)
                         {

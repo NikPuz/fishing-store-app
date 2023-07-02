@@ -30,7 +30,7 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Border x:Name="test" Width="auto">
+        <Border Width="auto">
             <TabControl TabStripPlacement="Left">
                 <TabControl.Resources>
                     <Style TargetType="TabItem" >
@@ -417,6 +417,10 @@
                                         <TextBlock>Высота:</TextBlock>
                                         <TextBox Width="50" Text="{Binding TBPrintBarcodeHeight, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Размер %:</TextBlock>
+                                        <TextBox Width="50" Text="{Binding TBScalePercent, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
                                 </WrapPanel>
                                 <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -433,5 +437,50 @@
                 </TabItem>
             </TabControl>
         </Border>
+        <UserControl>
+            <UserControl.Resources>
+                <Style x:Key="expandAreaStyle" TargetType="{x:Type Border}">
+                    <Setter Property="Margin" Value="0 0 0 0"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsChecked, ElementName=expandButton}" Value="False">
+                            <Setter Property="IsEnabled" Value="True"/>
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Width">
+                                        <DoubleAnimation From="320" To="20" Duration="0:0:.3" AccelerationRatio="1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Width">
+                                        <DoubleAnimation From="20" To="320" Duration="0:0:.3" AccelerationRatio="1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </UserControl.Resources>
+            <Border x:Name="expandArea" Style="{DynamicResource expandAreaStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- The expand menu button -->
+                    <ToggleButton x:Name="expandButton" Grid.Column="0" Width="60" Height="20" Content="Касса" HorizontalAlignment="Center">
+                        <ToggleButton.LayoutTransform>
+                            <RotateTransform Angle="-90"/>
+                        </ToggleButton.LayoutTransform>
+                    </ToggleButton>
+
+                    <!-- The content -->
+                    <TextBlock Margin="0, 0, 0, 0" Grid.Column="1" Text="Какой-нибудь контент" Width="300" Background="Orange"/>
+                </Grid>
+            </Border>
+        </UserControl>
     </Grid>
 </Window>
