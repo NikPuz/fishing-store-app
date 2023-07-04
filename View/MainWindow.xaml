@@ -55,6 +55,7 @@
                                     <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
                                     <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                                     <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
                                     <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
                                     <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
@@ -85,6 +86,10 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock>Производитель:</TextBlock>
                                         <ComboBox Width="100" ItemsSource="{Binding CBProductManufacturer}" SelectedItem="{Binding SelectedCBProductManufacturer, UpdateSourceTrigger=PropertyChanged}"></ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Описание:</TextBlock>
+                                        <TextBox Width="500" Text="{Binding TBProductDescription, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
                                 </WrapPanel>
                                 <Grid Grid.Row="1">
@@ -336,7 +341,7 @@
                 </TabItem>
                 <TabItem>
                     <TabItem.Header>
-                        <TextBlock Text="Штрихкоды" />
+                        <TextBlock Text="Ценники" />
                     </TabItem.Header>
                     <TabItem.Content>
                         <Grid>
@@ -410,16 +415,8 @@
                                 </Grid.RowDefinitions>
                                 <WrapPanel Grid.Row="0" HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock>Ширина:</TextBlock>
-                                        <TextBox Width="50" Text="{Binding TBPrintDpi, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock>Высота:</TextBlock>
-                                        <TextBox Width="50" Text="{Binding TBPrintBarcodeHeight, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock>Размер %:</TextBlock>
-                                        <TextBox Width="50" Text="{Binding TBScalePercent, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                        <TextBlock>Колонок:</TextBlock>
+                                        <TextBox Width="50" Text="{Binding TBPrintColums, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
                                 </WrapPanel>
                                 <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center">

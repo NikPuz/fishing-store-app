@@ -14,6 +14,7 @@ namespace fishing_store_app.Model
         private int id;
         private string name;
         private int price;
+        private string description;
         private int stock;
         private string category;
         private string manufacturer;
@@ -43,6 +44,15 @@ namespace fishing_store_app.Model
             {
                 price = value;
                 OnPropertyChanged("Price");
+            }
+        }
+        public string Description
+        {
+            get { return description; }
+            set
+            {
+                description = value;
+                OnPropertyChanged("Description");
             }
         }
         public int Stock
@@ -86,6 +96,7 @@ namespace fishing_store_app.Model
         public int Id;
         public string Name;
         public int Price;
+        public string Description;
         public int Stock;
         public int CategoryId;
         public int ManufacturerId;

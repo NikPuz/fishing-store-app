@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -17,15 +16,11 @@ using System.Windows.Input;
 using Image = iTextSharp.text.Image;
 using Barcoded;
 using System.Diagnostics;
-using System.Runtime.Serialization;
 using System.Drawing;
 using Rectangle = iTextSharp.text.Rectangle;
 using Font = System.Drawing.Font;
-using PdfSharp.Drawing;
-using Aspose.Pdf;
-using Color = System.Drawing.Color;
 using Document = iTextSharp.text.Document;
-using SixLabors.ImageSharp.Processing;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace fishing_store_app
 {
@@ -62,9 +57,7 @@ namespace fishing_store_app
             fillManufacturers();
             fillSales();
             TBBarcodeCount = 1;
-            TBPrintDpi = 300;
-            TBPrintBarcodeHeight = 300;
-            TBScalePercent = 100;
+            TBPrintColums = 3;
         }
 
         private void fillProducts()
@@ -134,6 +127,7 @@ namespace fishing_store_app
                     {
                         Name = TBProductName,
                         Price = TBProductPrice,
+                        Description = TBProductDescription,
                         Stock = TBProductStock,
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
@@ -160,6 +154,7 @@ namespace fishing_store_app
                         Id = SelectedProduct.Id,
                         Name = TBProductName,
                         Price = TBProductPrice,
+                        Description = TBProductDescription,
                         Stock = TBProductStock,
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
@@ -198,6 +193,7 @@ namespace fishing_store_app
                 if (value != null) {
                     TBProductName = value.Name;
                     TBProductPrice = value.Price;
+                    TBProductDescription = value.Description;
                     TBProductStock = value.Stock;
                     SelectedCBProductCategory = value.Category;
                     SelectedCBProductManufacturer = value.Manufacturer;
@@ -226,6 +222,17 @@ namespace fishing_store_app
             set
             {
                 _tBProductPrice = value;
+                NotifyPropertyChanged();
+            }
+        }
+        
+        private string _tBProductDescription;
+        public string TBProductDescription
+        {
+            get { return _tBProductDescription; }
+            set
+            {
+                _tBProductDescription = value;
                 NotifyPropertyChanged();
             }
         }
@@ -715,35 +722,13 @@ namespace fishing_store_app
             }
         }
 
-        private int _tBPrintDpi;
-        public int TBPrintDpi
+        private int _tBPrintColums;
+        public int TBPrintColums
         {
-            get { return _tBPrintDpi; }
+            get { return _tBPrintColums; }
             set
             {
-                _tBPrintDpi = value;
-                NotifyPropertyChanged();
-            }
-        }
-        
-        private int _tBPrintBarcodeHeight;
-        public int TBPrintBarcodeHeight
-        {
-            get { return _tBPrintBarcodeHeight; }
-            set
-            {
-                _tBPrintBarcodeHeight = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private int _tBScalePercent;
-        public int TBScalePercent
-        {
-            get { return _tBScalePercent; }
-            set
-            {
-                _tBScalePercent = value;
+                _tBPrintColums = value;
                 NotifyPropertyChanged();
             }
         }
@@ -790,17 +775,13 @@ namespace fishing_store_app
                         return;
                     }
 
-                    //var saveFileDialog = new SaveFileDialog { FileName = "Barcodes", Filter = "PDF file (*.pdf)|*.pdf" };
-
                     var document = new Document();
 
                     var fileStream = new FileStream("Barcodes.pdf", FileMode.Create, FileAccess.Write, FileShare.None);
 
                     PdfWriter.GetInstance(document, fileStream);
 
-                    // Для отображения русских букв
-                    //var baseFont = BaseFont.CreateFont(@"C:\Windows\Fonts\Arial.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    //var font = new iTextSharp.text.Font(baseFont, 14);
+                    var images = new List<Image>();
 
                     document.Open();
 
@@ -824,53 +805,83 @@ namespace fishing_store_app
                         {
                             Encoder =
                             {
-                                Dpi = 100,
-                                BarcodeHeight = TBPrintDpi
+                                Dpi = 300,
+                                BarcodeHeight = 100
                             }
                         };
 
-                        //var image = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
-                        //image.ScalePercent(TBScalePercent);
-                        //System.Drawing.Image img = System.Drawing.Image.FromStream(new MemoryStream(image.RawData));
-                        //var img = System.Drawing.Image.FromStream(new MemoryStream(image.RawData));
-                        //Graphics g = Graphics.FromImage(img);
-                        //Bitmap b = new Bitmap(newBarcode.Image.Width, newBarcode.Image.Height);
-                        //var g = Graphics.FromImage(b);
-                        //g.DrawString(item.Product.Name, font, color, 17, 2);
-
-                        Bitmap bmp = new Bitmap(TBPrintDpi, newBarcode.Image.Height);
-                        bmp.SetResolution(100, 100);
+                        var bmp = new Bitmap(300, 300);
+                        bmp.SetResolution(250, 250);
                         Graphics graph = Graphics.FromImage(bmp);
-                        System.Drawing.Rectangle ImageSize = new System.Drawing.Rectangle(0, 0, TBPrintDpi, newBarcode.Image.Height);
-                        graph.FillRectangle(Brushes.White, ImageSize);
-                        
+                        graph.FillRectangle(Brushes.White, 0, 0, bmp.Width, bmp.Height);
+
                         var barcodeImage = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
-                        barcodeImage.ScalePercent(TBScalePercent);
-                        graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), 0, newBarcode.Image.Height/3*2);
-                        Font font = new Font("Times New Roman", 6);
-                        SolidBrush color = new SolidBrush(Color.Yellow);
-                        
+
+                        graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), 0, bmp.Height * 2 / 3);
+
                         var textBounds = graph.VisibleClipBounds;
                         textBounds.Inflate(-5, -5);
+                        Font font = new Font("Arial", 10);
+                        graph.DrawString(
+                            item.Product.Name,
+                            font,
+                            Brushes.Black,
+                            textBounds
+                        );
 
-                        //graph.DrawString(
-                        //    item.Product.Name,
-                        //    font,
-                        //    Brushes.Yellow,
-                        //    textBounds
-                        //);
+                        textBounds.Inflate(-5, -35);
+                        font = new Font("Arial", 6);
+                        graph.DrawString(
+                            item.Product.Manufacturer,
+                            font,
+                            Brushes.Black,
+                            textBounds
+                        );
+
+                        textBounds.Inflate(-5, -25);
+                        font = new Font("Arial", 4);
+                        graph.DrawString(
+                            item.Product.Description,
+                            font,
+                            Brushes.Black,
+                            textBounds
+                        );
+
+
+                        font = new Font("Arial", 24);
+                        textBounds.Inflate(-25, -40);
+                        if (item.Product.Price > 999)
+                        {
+                            font = new Font("Arial", 18);
+                            textBounds.Inflate(-10, -15);
+                        }
+                        graph.DrawString(
+                            item.Product.Price.ToString() + "₽",
+                            font,
+                            Brushes.Black,
+                            textBounds
+                        );
 
                         var image = Image.GetInstance(bmp, ImageFormat.Bmp);
                         image.Border = Rectangle.BOX;
                         image.BorderColor = BaseColor.GRAY;
-                        image.BorderWidth = 3f;
+                        image.BorderWidth = 6f;
                         image.SpacingBefore = 10f;
-                        //document.Add(new Paragraph(item.Product.Name, font));
+
                         for (var i = 0; i < item.Count; i++)
                         {
-                            document.Add(image);
+                            images.Add(image);
                         }
                     }
+
+                    var table = new PdfPTable(TBPrintColums);
+
+                    for (var i = 0; i < images.Count; i++)
+                    {
+                        table.AddCell(new PdfPCell(images[i], true));
+                    }
+                    table.CompleteRow();
+                    document.Add(table);
 
                     document.Close();
 

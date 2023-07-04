@@ -23,6 +23,9 @@
     <PackageReference Include="BarcodeLib" Version="2.4.0" />
     <PackageReference Include="Barcoder.Renderer.Image" Version="2.0.0" />
     <PackageReference Include="Caliburn.Micro.Core" Version="4.0.212" />
+    <PackageReference Include="FastReport.OpenSource" Version="2023.2.20" />
+    <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2023.2.20" />
+    <PackageReference Include="FastReport.OpenSource.Web" Version="2023.2.20" />
     <PackageReference Include="iTextSharp" Version="5.5.12" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
