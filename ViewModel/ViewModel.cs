@@ -40,13 +40,15 @@ namespace fishing_store_app
         
         public ObservableCollection<Printing> Printings { get; set; }
 
+        public ObservableCollection<BasketItem> Basket { get; set; }
+
         private Dictionary<string, int> CategoriesId { get; set; }
 
         private Dictionary<string, int> ManufacturersId { get; set; }
 
         private static HttpClient sharedClient = new()
         {
-            BaseAddress = new Uri("http://localhost:8080/"),
+            BaseAddress = new Uri("http://62.109.22.0:8088/"),
         };
 
         public ViewModel()
@@ -56,6 +58,7 @@ namespace fishing_store_app
             fillCategories();
             fillManufacturers();
             fillSales();
+            fillSupplies();
             TBBarcodeCount = 1;
             TBPrintColums = 3;
         }
@@ -517,7 +520,7 @@ namespace fishing_store_app
                 (_refreshSuppies = new RelayCommand(obj =>
                 {
                     fillSupplies();
-                    NotifyPropertyChanged("Suppies");
+                    NotifyPropertyChanged("Supplies");
                 }));
             }
         }
@@ -819,26 +822,23 @@ namespace fishing_store_app
 
                         graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), 0, bmp.Height * 2 / 3);
 
+                        var name = item.Product.Name + " " + item.Product.Manufacturer;
+                        if (item.Product.Manufacturer == "Без производителя")
+                        {
+                            name = item.Product.Name;
+                        }
+
                         var textBounds = graph.VisibleClipBounds;
                         textBounds.Inflate(-5, -5);
                         Font font = new Font("Arial", 10);
                         graph.DrawString(
-                            item.Product.Name,
+                            name,
                             font,
                             Brushes.Black,
                             textBounds
                         );
 
-                        textBounds.Inflate(-5, -35);
-                        font = new Font("Arial", 6);
-                        graph.DrawString(
-                            item.Product.Manufacturer,
-                            font,
-                            Brushes.Black,
-                            textBounds
-                        );
-
-                        textBounds.Inflate(-5, -25);
+                        textBounds.Inflate(-5, -80);
                         font = new Font("Arial", 4);
                         graph.DrawString(
                             item.Product.Description,
@@ -847,9 +847,8 @@ namespace fishing_store_app
                             textBounds
                         );
 
-
                         font = new Font("Arial", 24);
-                        textBounds.Inflate(-25, -40);
+                        textBounds.Inflate(-25, -20);
                         if (item.Product.Price > 999)
                         {
                             font = new Font("Arial", 18);

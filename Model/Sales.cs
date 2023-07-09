@@ -70,7 +70,7 @@ namespace fishing_store_app.Model
         }
     }
 
-    class SaleItem : INotifyPropertyChanged
+    public class SaleItem : INotifyPropertyChanged
     {
         private int id;
         private int saleId;
@@ -120,5 +120,11 @@ namespace fishing_store_app.Model
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
+    }
+
+    public class RequestSale
+    {
+        public int CashierId;
+        public List<SaleItem> SaleItems;
     }
 }

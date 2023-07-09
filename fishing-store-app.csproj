@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Resources\cashBox.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Aspose.PDF" Version="23.6.0" />
     <PackageReference Include="BarCode" Version="2023.6.1" />
     <PackageReference Include="Barcoded" Version="1.0.2" />
@@ -34,14 +30,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\cashBox.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ApplicationDefinition Update="App.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

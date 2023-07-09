@@ -475,7 +475,40 @@
                     </ToggleButton>
 
                     <!-- The content -->
-                    <TextBlock Margin="0, 0, 0, 0" Grid.Column="1" Text="Какой-нибудь контент" Width="300" Background="Orange"/>
+                    <Grid Grid.Column="2" Width="300" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid Grid.ColumnSpan="3" ItemsSource="{Binding Basket}" SelectedItem="{Binding SelectedBasketItem}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Id" Binding="{Binding ProductId}"/>
+                                <DataGridTextColumn Header="Кол-во" Binding="{Binding Count}"/>
+                                <DataGridTextColumn Header="Цена(ед.)" Binding="{Binding UnitPrice}"/>
+                                <DataGridTextColumn Header="Продукт" Binding="{Binding ProductName}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+                            <TextBlock HorizontalAlignment="Center">К оплате:</TextBlock>
+                            <TextBlock VerticalAlignment="Center" FontSize="24" Width="80" Text="40₽" TextAlignment="Center"></TextBlock>
+                        </StackPanel>
+                        <Button Grid.Row="1" Grid.Column="1" Height="50" Width="100" FontSize="16" Command="{Binding Sale}">Продать</Button>
+                        <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center">
+                            <TextBlock HorizontalAlignment="Center">Скан:</TextBlock>
+                            <TextBox VerticalAlignment="Center" FontSize="11" Height="32" Width="85" Text="{Binding TBBarcode, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Command="{Binding DeleteSales}">Удалить</Button>
+                            <Button Command="{Binding ClearSales}">Отчистить</Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
         </UserControl>
