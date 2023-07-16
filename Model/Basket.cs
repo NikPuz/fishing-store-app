@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace fishing_store_app.Model
 {
-    class BasketItem : INotifyPropertyChanged
+    public class BasketItem : INotifyPropertyChanged
     {
         private int productId;
         private string productName;

@@ -6,10 +6,15 @@
     <RootNamespace>fishing_store_app</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>fish.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <ApplicationDefinition Remove="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="fish.ico" />
   </ItemGroup>
 
   <ItemGroup>

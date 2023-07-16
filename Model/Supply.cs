@@ -77,7 +77,7 @@ namespace fishing_store_app.Model
             get { return date; }
             set
             {
-                date = value;
+                date = value.AddHours(3);
                 OnPropertyChanged("Date");
             }
         }

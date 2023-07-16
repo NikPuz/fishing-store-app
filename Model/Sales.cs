@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -48,7 +49,7 @@ namespace fishing_store_app.Model
             get { return date; }
             set
             {
-                date = value;
+                date = value.AddHours(3);
                 OnPropertyChanged("Date");
             }
         }
@@ -76,6 +77,7 @@ namespace fishing_store_app.Model
         private int saleId;
         private string? productName;
         private int unitPrice;
+        private int count;
 
         public int Id
         {
@@ -113,6 +115,15 @@ namespace fishing_store_app.Model
                 OnPropertyChanged("UnitPrice");
             }
         }
+        public int Count
+        {
+            get { return count; }
+            set
+            {
+                count = value;
+                OnPropertyChanged("Count");
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
@@ -125,6 +136,6 @@ namespace fishing_store_app.Model
     public class RequestSale
     {
         public int CashierId;
-        public List<SaleItem> SaleItems;
+        public ObservableCollection<BasketItem> SaleItems;
     }
 }

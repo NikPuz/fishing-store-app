@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="900">
+        Title="Fishing Store" Height="450" Width="900">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="35" />
@@ -38,7 +38,7 @@
                         <Setter Property="Width" Value="125" />
                     </Style>
                 </TabControl.Resources>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown">
                     <TabItem.Header>
                         <TextBlock Text="Продукты" />
                     </TabItem.Header>
@@ -53,12 +53,12 @@
                                 RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="175"/>
                                     <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                                     <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
                                     <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
                                     <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="175"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Grid Grid.Row="1">
@@ -89,7 +89,11 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock>Описание:</TextBlock>
-                                        <TextBox Width="500" Text="{Binding TBProductDescription, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                        <TextBox Width="300" Text="{Binding TBProductDescription, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>Штрихкод:</TextBlock>
+                                        <TextBox Width="100" Text="{Binding TBProductBarcode, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                                     </StackPanel>
                                 </WrapPanel>
                                 <Grid Grid.Row="1">
@@ -103,13 +107,13 @@
                                         <Button Command="{Binding UpdateProduct}" HorizontalAlignment="Left">Изменить</Button>
                                         <Button Command="{Binding DeleteProduct}" HorizontalAlignment="Left">Удалить</Button>
                                     </StackPanel>
-                                    <Button Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="5,0,0,0">Обновить</Button>
+                                    <Button x:Name="refreshProductsButton" Command="{Binding RefreshProducts}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="5,0,0,0">Обновить</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown_5">
                     <TabItem.Header>
                         <TextBlock Text="Категории" />
                     </TabItem.Header>
@@ -148,13 +152,13 @@
                                         <Button Command="{Binding UpdateCategory}" HorizontalAlignment="Left">Изменить</Button>
                                         <Button Command="{Binding DeleteCategory}" HorizontalAlignment="Left">Удалить</Button>
                                     </StackPanel>
-                                    <Button Command="{Binding RefreshCategories}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                    <Button x:Name="refreshCategoriesButton" Command="{Binding RefreshCategories}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown_4">
                     <TabItem.Header>
                         <TextBlock Text="Производители" />
                     </TabItem.Header>
@@ -193,13 +197,13 @@
                                         <Button Command="{Binding UpdateManufacturer}" HorizontalAlignment="Left">Изменить</Button>
                                         <Button Command="{Binding DeleteManufacturer}" HorizontalAlignment="Left">Удалить</Button>
                                     </StackPanel>
-                                    <Button Command="{Binding RefreshManufacturers}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
+                                    <Button x:Name="refreshManufacturersButton" Command="{Binding RefreshManufacturers}" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">Обновить</Button>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown_3">
                     <TabItem.Header>
                         <TextBlock Text="Поставки" />
                     </TabItem.Header>
@@ -223,7 +227,7 @@
                                     RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding ProductName}"/>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding ProductName}" Width="150"/>
                                         <DataGridTextColumn Header="Category" Binding="{Binding ProductCategory}"/>
                                         <DataGridTextColumn Header="Manufacturer" Binding="{Binding ProductManufacturer}"/>
                                         <DataGridTextColumn Header="UnitPrice" Binding="{Binding UnitPrice}"/>
@@ -238,23 +242,13 @@
                                     </Grid.RowDefinitions>
                                     <WrapPanel Grid.Row="0">
                                     </WrapPanel>
-                                    <Grid Grid.Row="1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Command="{Binding RefreshSuppies}" VerticalAlignment="Top">Обновить</Button>
-                                        </StackPanel>
-
+                                    <Button x:Name="refreshSuppiesButton" Grid.Row="1" HorizontalAlignment="Left" Command="{Binding RefreshSuppies}">Обновить</Button>
                                     </Grid>
-                                </Grid>
                             </Grid>
                             <DataGrid Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedSupplyProduct}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
                                 RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="150"/>
                                     <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
                                     <DataGridTextColumn Header="Manufacturer" Binding="{Binding Manufacturer}"/>
                                 </DataGrid.Columns>
@@ -302,7 +296,7 @@
                         </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown_2">
                     <TabItem.Header>
                         <TextBlock Text="Продажи" />
                     </TabItem.Header>
@@ -329,17 +323,18 @@
                                 RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
-                                    <DataGridTextColumn Header="ProductName" Binding="{Binding ProductName}"/>
+                                    <DataGridTextColumn Header="ProductName" Binding="{Binding ProductName}" Width="150"/>
                                     <DataGridTextColumn Header="UnitPrice" Binding="{Binding UnitPrice}"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Grid Grid.Row="1" Grid.ColumnSpan="2">
-                                <Button Command="{Binding RefreshSales}" Grid.Column="0" HorizontalAlignment="Center">Обновить</Button>
+                                <Button x:Name="refreshSalesButton" Command="{Binding RefreshSales}" Grid.Column="0" HorizontalAlignment="Left">Обновить</Button>
                             </Grid>
                         </Grid>
                     </TabItem.Content>
                 </TabItem>
-                <TabItem>
+                <TabItem MouseLeftButtonDown="TabItem_MouseLeftButtonDown_1">
                     <TabItem.Header>
                         <TextBlock Text="Ценники" />
                     </TabItem.Header>
@@ -363,7 +358,7 @@
                                 RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="150"/>
                                         <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
                                         <DataGridTextColumn Header="Stock" Binding="{Binding Stock}"/>
                                         <DataGridTextColumn Header="Category" Binding="{Binding Category}"/>
@@ -403,7 +398,7 @@
                             <DataGrid Grid.Row="0" Grid.Column="2" ItemsSource="{Binding Printings}" SelectedItem="{Binding SelectedPrinting}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
                                 RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Product.Name}"/>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Product.Name}" Width="200"/>
                                     <DataGridTextColumn Header="Count" Binding="{Binding Count}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -460,15 +455,14 @@
                     </Style.Triggers>
                 </Style>
             </UserControl.Resources>
-            <Border x:Name="expandArea" Style="{DynamicResource expandAreaStyle}">
+            <Border Style="{DynamicResource expandAreaStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-
                     <!-- The expand menu button -->
-                    <ToggleButton x:Name="expandButton" Grid.Column="0" Width="60" Height="20" Content="Касса" HorizontalAlignment="Center">
+                    <ToggleButton x:Name="expandButton" Grid.Column="0" Width="60" Height="20" Content="Касса" HorizontalAlignment="Center" Click="expandButton_Click">
                         <ToggleButton.LayoutTransform>
                             <RotateTransform Angle="-90"/>
                         </ToggleButton.LayoutTransform>
@@ -497,18 +491,21 @@
                         </DataGrid>
                         <StackPanel Grid.Row="1" HorizontalAlignment="Center">
                             <TextBlock HorizontalAlignment="Center">К оплате:</TextBlock>
-                            <TextBlock VerticalAlignment="Center" FontSize="24" Width="80" Text="40₽" TextAlignment="Center"></TextBlock>
+                            <TextBlock VerticalAlignment="Center" FontSize="24" Width="80" Text="{Binding TBPrice, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBlock>
                         </StackPanel>
-                        <Button Grid.Row="1" Grid.Column="1" Height="50" Width="100" FontSize="16" Command="{Binding Sale}">Продать</Button>
+                        <Button Grid.Row="1" Grid.Column="1" Height="50" Width="100" FontSize="16" Command="{Binding Sale}" Click="Button_Click">Продано</Button>
                         <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center">
-                            <TextBlock HorizontalAlignment="Center">Скан:</TextBlock>
-                            <TextBox VerticalAlignment="Center" FontSize="11" Height="32" Width="85" Text="{Binding TBBarcode, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
+                            <TextBlock HorizontalAlignment="Center">Штрихкод:</TextBlock>
+                            <TextBox x:Name="tBBarcode" VerticalAlignment="Center" FontSize="11" Height="32" Width="85" Text="{Binding TBBarcode, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Command="{Binding DeleteSales}">Удалить</Button>
-                            <Button Command="{Binding ClearSales}">Отчистить</Button>
+                            <Button Command="{Binding DeleteBasket}" Click="deleteBasketButton_Click">Удалить</Button>
+                            <Button Command="{Binding ClearBasket}" Click="clearBasketButton_Click">Отчистить</Button>
                         </StackPanel>
                     </Grid>
+                    <Border BorderBrush="#000000" BorderThickness="1" Margin="0" Grid.Column="1">
+                        <Grid/>
+                    </Border>
                 </Grid>
             </Border>
         </UserControl>

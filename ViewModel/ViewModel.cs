@@ -21,6 +21,7 @@ using Rectangle = iTextSharp.text.Rectangle;
 using Font = System.Drawing.Font;
 using Document = iTextSharp.text.Document;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace fishing_store_app
 {
@@ -60,7 +61,8 @@ namespace fishing_store_app
             fillSales();
             fillSupplies();
             TBBarcodeCount = 1;
-            TBPrintColums = 3;
+            TBPrintColums = 5;
+            Basket = new ObservableCollection<BasketItem>();
         }
 
         private void fillProducts()
@@ -96,12 +98,22 @@ namespace fishing_store_app
 
         private void fillSupplies()
         {
-            Supplies = new ObservableCollection<Supply>(sharedClient.GetFromJsonAsync<List<Supply>>("supplies", default).Result);
+            var request = sharedClient.GetFromJsonAsync<List<Supply>>("supplies", default);
+
+            if (request.Result != null)
+            {
+                Supplies = new ObservableCollection<Supply>(request.Result);
+            }
         }
 
         private void fillSales()
         {
-            Sales = new ObservableCollection<Sale>(sharedClient.GetFromJsonAsync<List<Sale>>("sales", default).Result);
+            var request = sharedClient.GetFromJsonAsync<List<Sale>>("sales", default);
+
+            if (request.Result != null)
+            {
+                Sales = new ObservableCollection<Sale>(request.Result);
+            }
         }
 
         private RelayCommand _refreshProducts;
@@ -132,12 +144,13 @@ namespace fishing_store_app
                         Price = TBProductPrice,
                         Description = TBProductDescription,
                         Stock = TBProductStock,
+                        Barcode = TBProductBarcode,
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
 
                     sharedClient.PostAsync("products", new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
@@ -159,12 +172,13 @@ namespace fishing_store_app
                         Price = TBProductPrice,
                         Description = TBProductDescription,
                         Stock = TBProductStock,
+                        Barcode = TBProductBarcode,
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
 
                     sharedClient.PutAsync("products", new StringContent(JsonConvert.SerializeObject(requestProduct), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
@@ -180,7 +194,7 @@ namespace fishing_store_app
                 (_deleteProduct = new RelayCommand(obj =>
                 {
                     sharedClient.DeleteAsync("products/" + SelectedProduct.Id);
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillProducts();
                     NotifyPropertyChanged("Products");
                 }));
@@ -198,6 +212,7 @@ namespace fishing_store_app
                     TBProductPrice = value.Price;
                     TBProductDescription = value.Description;
                     TBProductStock = value.Stock;
+                    TBProductBarcode = value.Barcode;
                     SelectedCBProductCategory = value.Category;
                     SelectedCBProductManufacturer = value.Manufacturer;
 
@@ -247,6 +262,17 @@ namespace fishing_store_app
             set
             {
                 _tBProductStock = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private Int64 _tBProductBarcode;
+        public Int64 TBProductBarcode
+        {
+            get { return _tBProductBarcode; }
+            set
+            {
+                _tBProductBarcode = value;
                 NotifyPropertyChanged();
             }
         }
@@ -329,7 +355,7 @@ namespace fishing_store_app
                     };
 
                     sharedClient.PostAsync("categories", new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillCategories();
                     NotifyPropertyChanged("Categories");
                 }));
@@ -351,7 +377,7 @@ namespace fishing_store_app
                     };
 
                     sharedClient.PutAsync("categories", new StringContent(JsonConvert.SerializeObject(category), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillCategories();
                     NotifyPropertyChanged("Categories");
                 }));
@@ -369,7 +395,7 @@ namespace fishing_store_app
                     if (SelectedCategory.Id != 0)
                     {
                         sharedClient.DeleteAsync("categories/" + SelectedCategory.Id);
-                        Thread.Sleep(5);
+                        Thread.Sleep(50);
                         fillCategories();
                         fillProducts();
                         NotifyPropertyChanged("Categories");
@@ -434,7 +460,7 @@ namespace fishing_store_app
                     };
 
                     sharedClient.PostAsync("manufacturers", new StringContent(JsonConvert.SerializeObject(manufacturer), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillManufacturers();
                     NotifyPropertyChanged("Manufacturers");
                 }));
@@ -456,7 +482,7 @@ namespace fishing_store_app
                     };
 
                     sharedClient.PutAsync("manufacturers", new StringContent(JsonConvert.SerializeObject(manufacturer), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillManufacturers();
                     NotifyPropertyChanged("Manufacturers");
                 }));
@@ -474,7 +500,7 @@ namespace fishing_store_app
                     if (SelectedManufacturer.Id != 0)
                     {
                         sharedClient.DeleteAsync("manufacturers/" + SelectedManufacturer.Id);
-                        Thread.Sleep(5);
+                        Thread.Sleep(50);
                         fillManufacturers();
                         fillProducts();
                         NotifyPropertyChanged("Manufacturers");
@@ -561,7 +587,7 @@ namespace fishing_store_app
                     };
 
                     sharedClient.PostAsync("supplies", new StringContent(JsonConvert.SerializeObject(supply), Encoding.UTF8));
-                    Thread.Sleep(5);
+                    Thread.Sleep(50);
                     fillSupplies();
                     NotifyPropertyChanged("Supplies");
                 }));
@@ -790,26 +816,12 @@ namespace fishing_store_app
 
                     foreach (var item in Printings)
                     {
-                        var cuntryCode = "460";
-                        var manufacturerCode = ManufacturersId[item.Product.Manufacturer].ToString();
-                        var productCode = item.Product.Id.ToString();
-                        for (var i = 1; manufacturerCode.Length < 4; i++)
-                        {
-                            manufacturerCode = "0" + manufacturerCode;
-                        }
-
-                        for (var i = 1; productCode.Length < 5; i++)
-                        {
-                            productCode = "0" + productCode;
-                        }
-                        var itemBarcode = cuntryCode + manufacturerCode + productCode;
-
-                        LinearBarcode newBarcode = new LinearBarcode(itemBarcode, Symbology.Ean13)
+                        LinearBarcode newBarcode = new LinearBarcode(item.Product.Barcode.ToString(), Symbology.Ean13)
                         {
                             Encoder =
                             {
-                                Dpi = 300,
-                                BarcodeHeight = 100
+                                Dpi = 280,
+                                BarcodeHeight = 80
                             }
                         };
 
@@ -820,7 +832,7 @@ namespace fishing_store_app
 
                         var barcodeImage = Image.GetInstance(newBarcode.Image, ImageFormat.Jpeg);
 
-                        graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), 0, bmp.Height * 2 / 3);
+                        graph.DrawImage(System.Drawing.Image.FromStream(new MemoryStream(barcodeImage.RawData)), -10, bmp.Height * 2 / 3 + 15);
 
                         var name = item.Product.Name + " " + item.Product.Manufacturer;
                         if (item.Product.Manufacturer == "Без производителя")
@@ -830,7 +842,7 @@ namespace fishing_store_app
 
                         var textBounds = graph.VisibleClipBounds;
                         textBounds.Inflate(-5, -5);
-                        Font font = new Font("Arial", 10);
+                        Font font = new Font("Arial", 7, FontStyle.Bold);
                         graph.DrawString(
                             name,
                             font,
@@ -847,12 +859,12 @@ namespace fishing_store_app
                             textBounds
                         );
 
-                        font = new Font("Arial", 24);
-                        textBounds.Inflate(-25, -20);
+                        font = new Font("Arial", 20);
+                        textBounds.Inflate(-40, -33);
                         if (item.Product.Price > 999)
                         {
-                            font = new Font("Arial", 18);
-                            textBounds.Inflate(-10, -15);
+                            font = new Font("Arial", 20);
+                            textBounds.Inflate(15, -1);
                         }
                         graph.DrawString(
                             item.Product.Price.ToString() + "₽",
@@ -886,6 +898,145 @@ namespace fishing_store_app
 
                     Process.Start(new ProcessStartInfo("Barcodes.pdf") { UseShellExecute = true });
                 }));
+            }
+        }
+        
+        private string _tBPrice;
+        private int _tBIntPrice;
+        public string TBPrice
+        {
+            get { return _tBIntPrice.ToString() + "₽"; } set{}
+        }
+
+        private string _tBBarcode;
+        public string TBBarcode
+        {
+            get { return _tBBarcode; }
+            set
+            {
+                _tBBarcode = value;
+                if (value.Length == 13 )
+                {
+                    var product = new Product();
+
+                    for (var i = 0; i < Products.Count; i++)
+                    {
+                        if (Products[i].Barcode.ToString() == value)
+                        {
+                            product = Products[i];
+                            break;
+                        }
+                    }
+
+                    if (product.Id == 0)
+                    {
+                        TBBarcode = "";
+                        NotifyPropertyChanged();
+                        return;
+                    }
+
+                    for (var j = 0; j < Basket.Count; j++)
+                    {
+                        if (Basket[j].ProductId == product.Id)
+                        {
+                            Basket[j].Count++;
+                            NotifyPropertyChanged("Basket");
+                            _tBIntPrice += product.Price;
+                            NotifyPropertyChanged("TBPrice");
+                            TBBarcode = "";
+                            NotifyPropertyChanged();
+                            return;
+                        }
+                    }
+
+                    Basket.Add(new BasketItem()
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        UnitPrice = product.Price,
+                        Count = 1
+                    });
+                    NotifyPropertyChanged("Basket");
+                    _tBIntPrice += product.Price;
+                    NotifyPropertyChanged("TBPrice");
+                    TBBarcode = "";
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private RelayCommand _clearBasket;
+        public RelayCommand ClearBasket
+        {
+            get
+            {
+                return _clearBasket ??
+                (_clearBasket = new RelayCommand(obj =>
+                {
+                    Basket = new ObservableCollection<BasketItem>();
+                    NotifyPropertyChanged("Basket");
+                    _tBIntPrice = 0; 
+                    NotifyPropertyChanged("TBPrice");
+                }));
+            }
+        }
+
+        private RelayCommand _deleteBasket;
+        public RelayCommand DeleteBasket
+        {
+            get
+            {
+                return _deleteBasket ??
+                (_deleteBasket = new RelayCommand(obj =>
+                {
+                    if (SelectedBasketItem == null)
+                    {
+                        return;
+                    } 
+                    Basket.Remove(SelectedBasketItem);
+                    NotifyPropertyChanged("Basket");
+                    _tBIntPrice -= SelectedBasketItem.UnitPrice * SelectedBasketItem.Count;
+                    NotifyPropertyChanged("TBPrice");
+                }));
+            }
+        }
+
+        private RelayCommand _sale;
+        public RelayCommand Sale
+        {
+            get
+            {
+                return _sale ??
+                (_sale = new RelayCommand(obj =>
+                {
+                    var requestSale = new RequestSale
+                    {
+                        CashierId = 0,
+                        SaleItems = Basket
+                    };
+
+                    sharedClient.PostAsync("sales", new StringContent(JsonConvert.SerializeObject(requestSale), Encoding.UTF8));
+                    Thread.Sleep(50);
+
+                    Basket = new ObservableCollection<BasketItem>();
+                    NotifyPropertyChanged("Basket");
+                    _tBIntPrice = 0;
+                    NotifyPropertyChanged("TBPrice");
+                }));
+            }
+        }
+        
+        private BasketItem _selectedBasketItem;
+        public BasketItem SelectedBasketItem
+        {
+            get { return _selectedBasketItem; }
+            set
+            {
+                if (value != null)
+                {
+                    _selectedBasketItem = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
