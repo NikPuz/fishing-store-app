@@ -66,7 +66,7 @@ namespace fishing_store_app
 
         private void TabItem_MouseLeftButtonDown_3(object sender, MouseButtonEventArgs e)
         {
-            refreshSuppiesButton.Command.Execute(null);
+            refreshSuppliesButton.Command.Execute(null);
             refreshProductsButton.Command.Execute(null);
         }
 

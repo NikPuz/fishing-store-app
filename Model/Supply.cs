@@ -11,11 +11,8 @@ namespace fishing_store_app.Model
     class Supply : INotifyPropertyChanged
     {
         private int id;
-        private string? productName;
-        private string? productCategory;
-        private string? productManufacturer;
-        private int unitPrice;
-        private int count;
+        private List<SupplyItem> items;
+        private int sum;
         private DateTime date;
 
         public int Id
@@ -27,6 +24,50 @@ namespace fishing_store_app.Model
                 OnPropertyChanged("Id");
             }
         }
+        public List<SupplyItem> Items
+        {
+            get { return items; }
+            set
+            {
+                items = value;
+                OnPropertyChanged("Items");
+            }
+        }
+        public int Sum
+        {
+            get { return sum; }
+            set
+            {
+                sum = value;
+                OnPropertyChanged("Sum");
+            }
+        }
+        public DateTime Date
+        {
+            get { return date; }
+            set
+            {
+                date = value.AddHours(3);
+                OnPropertyChanged("Date");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
+    }
+
+    class SupplyItem : INotifyPropertyChanged
+    {
+        private string? productName;
+        private string? productCategory;
+        private string? productManufacturer;
+        private int unitPrice;
+        private int count;
+
         public string ProductName
         {
             get { return productName; }
@@ -70,15 +111,6 @@ namespace fishing_store_app.Model
             {
                 count = value;
                 OnPropertyChanged("Count");
-            }
-        }
-        public DateTime Date
-        {
-            get { return date; }
-            set
-            {
-                date = value.AddHours(3);
-                OnPropertyChanged("Date");
             }
         }
 

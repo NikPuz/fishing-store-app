@@ -34,7 +34,9 @@ namespace fishing_store_app
         public ObservableCollection<Manufacturer> Manufacturers { get; set; }
         
         public ObservableCollection<Supply> Supplies { get; set; }
-        
+
+        public ObservableCollection<SupplyItem> SuppliesItems { get; set; }
+
         public ObservableCollection<Sale> Sales { get; set; }
 
         public ObservableCollection<SaleItem> SaleItems { get; set; }
@@ -49,7 +51,7 @@ namespace fishing_store_app
 
         private static HttpClient sharedClient = new()
         {
-            BaseAddress = new Uri("http://62.109.22.0:8088/"),
+            BaseAddress = new Uri("http://localhost:8088/"),
         };
 
         public ViewModel()
@@ -537,13 +539,13 @@ namespace fishing_store_app
             }
         }
 
-        private RelayCommand _refreshSuppies;
-        public RelayCommand RefreshSuppies
+        private RelayCommand _refreshSupplies;
+        public RelayCommand RefreshSupplies
         {
             get
             {
-                return _refreshSuppies ??
-                (_refreshSuppies = new RelayCommand(obj =>
+                return _refreshSupplies ??
+                (_refreshSupplies = new RelayCommand(obj =>
                 {
                     fillSupplies();
                     NotifyPropertyChanged("Supplies");
@@ -551,103 +553,103 @@ namespace fishing_store_app
             }
         }
 
-
-        private Product _selectedSupplyProduct;
-        public Product SelectedSupplyProduct
+        private Supply _selectedSupply;
+        public Supply SelectedSupply
         {
-            get { return _selectedSupplyProduct; }
+            get { return _selectedSupply; }
             set
             {
                 if (value != null)
                 {
-                    TBSupplyProductName = value.Name;
-                    TBSupplyProductCategory = value.Category;
-                    TBSupplyProductManufacturer = value.Manufacturer;
-
-                    _selectedSupplyProduct = value;
-                    NotifyPropertyChanged();
+                    if (value != null)
+                    {
+                        _selectedSupply = value;
+                        SuppliesItems = new ObservableCollection<SupplyItem>(value.Items);
+                        NotifyPropertyChanged("SuppliesItems");
+                        NotifyPropertyChanged();
+                    }
                 }
             }
         }
 
-        private RelayCommand _createSupply;
-        public RelayCommand CreateSupply
-        {
-            get
-            {
-                return _createSupply ??
-                (_createSupply = new RelayCommand(obj =>
-                {
-                    var supply = new RequestSupply
-                    {
-                        ProductId = SelectedSupplyProduct.Id,
-                        UnitPrice = TBSupplyProductUnitPrice,
-                        Count = TBSupplyProductCount,
-                        Date = null
-                    };
+        //private RelayCommand _createSupply;
+        //public RelayCommand CreateSupply
+        //{
+        //    get
+        //    {
+        //        return _createSupply ??
+        //        (_createSupply = new RelayCommand(obj =>
+        //        {
+        //            var supply = new RequestSupply
+        //            {
+        //                ProductId = SelectedSupplyProduct.Id,
+        //                UnitPrice = TBSupplyProductUnitPrice,
+        //                Count = TBSupplyProductCount,
+        //                Date = null
+        //            };
 
-                    sharedClient.PostAsync("supplies", new StringContent(JsonConvert.SerializeObject(supply), Encoding.UTF8));
-                    Thread.Sleep(50);
-                    fillSupplies();
-                    NotifyPropertyChanged("Supplies");
-                }));
-            }
-        }
+        //            sharedClient.PostAsync("supplies", new StringContent(JsonConvert.SerializeObject(supply), Encoding.UTF8));
+        //            Thread.Sleep(50);
+        //            fillSupplies();
+        //            NotifyPropertyChanged("Supplies");
+        //        }));
+        //    }
+        //}
 
-        private string _tBSupplyProductName;
-        public string TBSupplyProductName
-        {
-            get { return _tBSupplyProductName; }
-            set
-            {
-                _tBSupplyProductName = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private string _tBSupplyProductName;
+        //public string TBSupplyProductName
+        //{
+        //    get { return _tBSupplyProductName; }
+        //    set
+        //    {
+        //        _tBSupplyProductName = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
-        private string _tBSupplyProductCategory;
-        public string TBSupplyProductCategory
-        {
-            get { return _tBSupplyProductCategory; }
-            set
-            {
-                _tBSupplyProductCategory = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private string _tBSupplyProductCategory;
+        //public string TBSupplyProductCategory
+        //{
+        //    get { return _tBSupplyProductCategory; }
+        //    set
+        //    {
+        //        _tBSupplyProductCategory = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
-        private string _tBSupplyProductManufacturer;
-        public string TBSupplyProductManufacturer
-        {
-            get { return _tBSupplyProductManufacturer; }
-            set
-            {
-                _tBSupplyProductManufacturer = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private string _tBSupplyProductManufacturer;
+        //public string TBSupplyProductManufacturer
+        //{
+        //    get { return _tBSupplyProductManufacturer; }
+        //    set
+        //    {
+        //        _tBSupplyProductManufacturer = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
-        private int _tBSupplyProductCount;
-        public int TBSupplyProductCount
-        {
-            get { return _tBSupplyProductCount; }
-            set
-            {
-                _tBSupplyProductCount = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private int _tBSupplyProductCount;
+        //public int TBSupplyProductCount
+        //{
+        //    get { return _tBSupplyProductCount; }
+        //    set
+        //    {
+        //        _tBSupplyProductCount = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
-        private int _tBSupplyProductUnitPrice;
-        public int TBSupplyProductUnitPrice
-        {
-            get { return _tBSupplyProductUnitPrice; }
-            set
-            {
-                _tBSupplyProductUnitPrice = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private int _tBSupplyProductUnitPrice;
+        //public int TBSupplyProductUnitPrice
+        //{
+        //    get { return _tBSupplyProductUnitPrice; }
+        //    set
+        //    {
+        //        _tBSupplyProductUnitPrice = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
         private RelayCommand _refreshSales;
         public RelayCommand RefreshSales
