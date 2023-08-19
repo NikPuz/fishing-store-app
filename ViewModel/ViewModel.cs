@@ -45,6 +45,8 @@ namespace fishing_store_app
 
         public ObservableCollection<BasketItem> Basket { get; set; }
 
+        public ObservableCollection<RequestSupply> SupplyBasket { get; set; }
+
         private Dictionary<string, int> CategoriesId { get; set; }
 
         private Dictionary<string, int> ManufacturersId { get; set; }
@@ -553,21 +555,138 @@ namespace fishing_store_app
             }
         }
 
-        private Supply _selectedSupply;
-        public Supply SelectedSupply
+        //private Supply _selectedSupply;
+        //public Supply SelectedSupply
+        //{
+        //    get { return _selectedSupply; }
+        //    set
+        //    {
+        //        if (value != null)
+        //        {
+        //            if (value != null)
+        //            {
+        //                _selectedSupply = value;
+        //                SuppliesItems = new ObservableCollection<SupplyItem>(value.Items);
+        //                NotifyPropertyChanged("SuppliesItems");
+        //                NotifyPropertyChanged();
+        //            }
+        //        }
+        //    }
+        //}
+
+        private string _tBSupplyBarcode;
+        public string TBBarcode
         {
-            get { return _selectedSupply; }
+            get { return _tBSupplyBarcode; }
+            set
+            {
+                _tBSupplyBarcode = value;
+                if (value.Length == 13)
+                {
+                    var product = new Product();
+
+                    for (var i = 0; i < Products.Count; i++)
+                    {
+                        if (Products[i].Barcode.ToString() == value)
+                        {
+                            product = Products[i];
+                            break;
+                        }
+                    }
+
+                    if (product.Id == 0)
+                    {
+                        TBSupplyBarcode = "";
+                        NotifyPropertyChanged();
+                        return;
+                    }
+
+                    for (var j = 0; j < SupplyBasket.Count; j++)
+                    {
+                        if (SupplyBasket[j]. == product.Id) //------------
+                        {
+                            SupplyBasket[j].Count++;
+                            NotifyPropertyChanged("SupplyBasket");
+                            NotifyPropertyChanged();
+                            return;
+                        }
+                    }
+
+                    Basket.Add(new BasketItem()
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        UnitPrice = product.Price,
+                        Count = 1
+                    });
+                    NotifyPropertyChanged("Basket");
+                    _tBIntPrice += product.Price;
+                    NotifyPropertyChanged("TBPrice");
+                    TBBarcode = "";
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private RelayCommand _clearSupplyBasket;
+        public RelayCommand ClearSupplyBasket
+        {
+            get
+            {
+                return _clearSupplyBasket ??
+                (_clearSupplyBasket = new RelayCommand(obj =>
+                {
+                    SupplyBasket = new ObservableCollection<SupplyItem>();
+                    NotifyPropertyChanged("SupplyBasket");
+                }));
+            }
+        }
+
+        private RelayCommand _deleteSupplyBasket;
+        public RelayCommand DeleteSupplyBasket
+        {
+            get
+            {
+                return _deleteSupplyBasket ??
+                (_deleteSupplyBasket = new RelayCommand(obj =>
+                {
+                    if (SelectedSupplyBasketItem == null)
+                    {
+                        return;
+                    }
+                    SupplyBasket.Remove(SelectedSupplyBasketItem);
+                    NotifyPropertyChanged("SupplyBasket");
+                }));
+            }
+        }
+
+        private RelayCommand _supply;
+        public RelayCommand Supply
+        {
+            get
+            {
+                return _supply ??
+                (_supply = new RelayCommand(obj =>
+                {
+                    sharedClient.PostAsync("supply", new StringContent(JsonConvert.SerializeObject(SupplyBasket), Encoding.UTF8));
+                    Thread.Sleep(50);
+
+                    //Basket = new ObservableCollection<BasketItem>();
+                    NotifyPropertyChanged("SupplyBasket");
+                }));
+            }
+        }
+
+        private SupplyItem _selectedSupplyBasketItem;
+        public SupplyItem SelectedSupplyBasketItem
+        {
+            get { return _selectedSupplyBasketItem; }
             set
             {
                 if (value != null)
                 {
-                    if (value != null)
-                    {
-                        _selectedSupply = value;
-                        SuppliesItems = new ObservableCollection<SupplyItem>(value.Items);
-                        NotifyPropertyChanged("SuppliesItems");
-                        NotifyPropertyChanged();
-                    }
+                    _selectedSupplyBasketItem = value;
+                    NotifyPropertyChanged();
                 }
             }
         }

@@ -212,6 +212,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -233,6 +234,35 @@
                                     <DataGridTextColumn Header="Count" Binding="{Binding Count}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <DataGrid Grid.ColumnSpan="3" ItemsSource="{Binding SupplyBasket}" SelectedItem="{Binding SelectedSupplyBasketItem}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
+                                RowBackground="LightGray" AlternatingRowBackground="White" CanUserAddRows="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding ProductId}"/>
+                                        <DataGridTextColumn Header="Кол-во" Binding="{Binding Count}"/>
+                                        <DataGridTextColumn Header="Цена(ед.)" Binding="{Binding UnitPrice}"/>
+                                        <DataGridTextColumn Header="Продукт" Binding="{Binding ProductName}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <Button Grid.Row="1" Grid.Column="0" Command="{Binding Supply}">Поставить</Button>
+                                <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center">
+                                    <TextBlock HorizontalAlignment="Center">Штрихкод:</TextBlock>
+                                    <TextBox VerticalAlignment="Center" FontSize="11" Height="32" Width="85" Text="{Binding TBSupplyBarcode, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"></TextBox>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Command="{Binding DeleteSupplyBasket}">Удалить</Button>
+                                    <Button Command="{Binding ClearSupplyBasket}">Отчистить</Button>
+                                </StackPanel>
+                            </Grid>
                             <Grid Grid.Row="1" Grid.ColumnSpan="2">
                                 <Button x:Name="refreshSuppliesButton" Command="{Binding RefreshSupplies}" Grid.Column="0" HorizontalAlignment="Left">Обновить</Button>
                             </Grid>
