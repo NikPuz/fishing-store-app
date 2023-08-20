@@ -45,7 +45,7 @@ namespace fishing_store_app
 
         public ObservableCollection<BasketItem> Basket { get; set; }
 
-        public ObservableCollection<RequestSupply> SupplyBasket { get; set; }
+        public ObservableCollection<BasketItem> SupplyBasket { get; set; }
 
         private Dictionary<string, int> CategoriesId { get; set; }
 
@@ -67,6 +67,7 @@ namespace fishing_store_app
             TBBarcodeCount = 1;
             TBPrintColums = 5;
             Basket = new ObservableCollection<BasketItem>();
+            SupplyBasket = new ObservableCollection<BasketItem>();
         }
 
         private void fillProducts()
@@ -555,27 +556,27 @@ namespace fishing_store_app
             }
         }
 
-        //private Supply _selectedSupply;
-        //public Supply SelectedSupply
-        //{
-        //    get { return _selectedSupply; }
-        //    set
-        //    {
-        //        if (value != null)
-        //        {
-        //            if (value != null)
-        //            {
-        //                _selectedSupply = value;
-        //                SuppliesItems = new ObservableCollection<SupplyItem>(value.Items);
-        //                NotifyPropertyChanged("SuppliesItems");
-        //                NotifyPropertyChanged();
-        //            }
-        //        }
-        //    }
-        //}
+        private Supply _selectedSupply;
+        public Supply SelectedSupply
+        {
+            get { return _selectedSupply; }
+            set
+            {
+                if (value != null)
+                {
+                    if (value != null)
+                    {
+                        _selectedSupply = value;
+                        SuppliesItems = new ObservableCollection<SupplyItem>(value.Items);
+                        NotifyPropertyChanged("SuppliesItems");
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+        }
 
         private string _tBSupplyBarcode;
-        public string TBBarcode
+        public string TBSupplyBarcode
         {
             get { return _tBSupplyBarcode; }
             set
@@ -603,26 +604,25 @@ namespace fishing_store_app
 
                     for (var j = 0; j < SupplyBasket.Count; j++)
                     {
-                        if (SupplyBasket[j]. == product.Id) //------------
+                        if (SupplyBasket[j].ProductId == product.Id)
                         {
                             SupplyBasket[j].Count++;
                             NotifyPropertyChanged("SupplyBasket");
+                            TBSupplyBarcode = "";
                             NotifyPropertyChanged();
                             return;
                         }
                     }
 
-                    Basket.Add(new BasketItem()
+                    SupplyBasket.Add(new BasketItem()
                     {
                         ProductId = product.Id,
                         ProductName = product.Name,
                         UnitPrice = product.Price,
                         Count = 1
                     });
-                    NotifyPropertyChanged("Basket");
-                    _tBIntPrice += product.Price;
-                    NotifyPropertyChanged("TBPrice");
-                    TBBarcode = "";
+                    NotifyPropertyChanged("SupplyBasket");
+                    TBSupplyBarcode = "";
                     NotifyPropertyChanged();
                 }
             }
@@ -636,7 +636,7 @@ namespace fishing_store_app
                 return _clearSupplyBasket ??
                 (_clearSupplyBasket = new RelayCommand(obj =>
                 {
-                    SupplyBasket = new ObservableCollection<SupplyItem>();
+                    SupplyBasket = new ObservableCollection<BasketItem>();
                     NotifyPropertyChanged("SupplyBasket");
                 }));
             }
@@ -668,17 +668,32 @@ namespace fishing_store_app
                 return _supply ??
                 (_supply = new RelayCommand(obj =>
                 {
-                    sharedClient.PostAsync("supply", new StringContent(JsonConvert.SerializeObject(SupplyBasket), Encoding.UTF8));
+                    var req = new List<RequestSupply>();
+
+                    for (int i = 0; i < SupplyBasket.Count; i++)
+                    {
+                        req.Add(new RequestSupply()
+                        {
+                            productId = SupplyBasket[i].ProductId,
+                            unitPrice = SupplyBasket[i].UnitPrice,
+                            count = SupplyBasket[i].Count
+                        });
+                    }
+
+                    sharedClient.PostAsync("supplies", new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8));
                     Thread.Sleep(50);
 
-                    //Basket = new ObservableCollection<BasketItem>();
+                    SupplyBasket = new ObservableCollection<BasketItem>();
                     NotifyPropertyChanged("SupplyBasket");
+
+                    fillSupplies();
+                    NotifyPropertyChanged("Supplies");
                 }));
             }
         }
 
-        private SupplyItem _selectedSupplyBasketItem;
-        public SupplyItem SelectedSupplyBasketItem
+        private BasketItem _selectedSupplyBasketItem;
+        public BasketItem SelectedSupplyBasketItem
         {
             get { return _selectedSupplyBasketItem; }
             set

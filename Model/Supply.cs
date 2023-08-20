@@ -124,10 +124,8 @@ namespace fishing_store_app.Model
 
     public class RequestSupply
     {
-        public int Id;
-        public int ProductId;
-        public int UnitPrice;
-        public int Count;
-        public DateTime? Date;
+        public int productId;
+        public int unitPrice;
+        public int count;
     }
 }
