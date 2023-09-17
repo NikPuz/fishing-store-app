@@ -289,7 +289,9 @@
                                     <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                                     <DataGridTextColumn Header="Sum" Binding="{Binding Sum}"/>
                                     <DataGridTextColumn Header="CashierId" Binding="{Binding CashierId}"/>
+                                    <DataGridTextColumn Header="PayType" Binding="{Binding PayType}"/>
                                     <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}"/>
+                                    <DataGridCheckBoxColumn Header="Refund" Binding="{Binding Refund}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                             <DataGrid Grid.Column="1" ItemsSource="{Binding SaleItems}" AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray"
@@ -303,6 +305,7 @@
                             </DataGrid>
                             <Grid Grid.Row="1" Grid.ColumnSpan="2">
                                 <Button x:Name="refreshSalesButton" Command="{Binding RefreshSales}" Grid.Column="0" HorizontalAlignment="Left">Обновить</Button>
+                                <Button Command="{Binding RefundSale}" Grid.Column="0" HorizontalAlignment="Center">Возврат</Button>
                             </Grid>
                         </Grid>
                     </TabItem.Content>
@@ -474,6 +477,10 @@
                         <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Command="{Binding DeleteBasket}" Click="deleteBasketButton_Click">Удалить</Button>
                             <Button Command="{Binding ClearBasket}" Click="clearBasketButton_Click">Отчистить</Button>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right">
+                                <RadioButton Content="Наличными" IsChecked="{Binding IsСashPay}" Margin="1"/>
+                                <RadioButton Content="Переводом" IsChecked="{Binding IsTranslationPay}" Margin="1"/>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                     <Border BorderBrush="#000000" BorderThickness="1" Margin="0" Grid.Column="1">

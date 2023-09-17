@@ -51,9 +51,11 @@ namespace fishing_store_app
 
         private Dictionary<string, int> ManufacturersId { get; set; }
 
+        private string PayType { get; set; }
+
         private static HttpClient sharedClient = new()
         {
-            BaseAddress = new Uri("http://localhost:8088/"),
+            BaseAddress = new Uri("http://62.109.22.0:8088/"),
         };
 
         public ViewModel()
@@ -68,6 +70,7 @@ namespace fishing_store_app
             TBPrintColums = 5;
             Basket = new ObservableCollection<BasketItem>();
             SupplyBasket = new ObservableCollection<BasketItem>();
+            IsСashPay = true;
         }
 
         private void fillProducts()
@@ -149,7 +152,7 @@ namespace fishing_store_app
                         Price = TBProductPrice,
                         Description = TBProductDescription,
                         Stock = TBProductStock,
-                        Barcode = TBProductBarcode,
+                        Barcode = TBProductBarcode.ToString(),
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
@@ -177,7 +180,7 @@ namespace fishing_store_app
                         Price = TBProductPrice,
                         Description = TBProductDescription,
                         Stock = TBProductStock,
-                        Barcode = TBProductBarcode,
+                        Barcode = TBProductBarcode.ToString(),
                         CategoryId = CategoriesId[SelectedCBProductCategory],
                         ManufacturerId = ManufacturersId[SelectedCBProductManufacturer]
                     };
@@ -271,8 +274,8 @@ namespace fishing_store_app
             }
         }
 
-        private Int64 _tBProductBarcode;
-        public Int64 TBProductBarcode
+        private string _tBProductBarcode;
+        public string TBProductBarcode
         {
             get { return _tBProductBarcode; }
             set
@@ -1148,7 +1151,9 @@ namespace fishing_store_app
                     var requestSale = new RequestSale
                     {
                         CashierId = 0,
-                        SaleItems = Basket
+                        SaleItems = Basket,
+                        PayType = PayType,
+                        Refund = false
                     };
 
                     sharedClient.PostAsync("sales", new StringContent(JsonConvert.SerializeObject(requestSale), Encoding.UTF8));
@@ -1158,10 +1163,36 @@ namespace fishing_store_app
                     NotifyPropertyChanged("Basket");
                     _tBIntPrice = 0;
                     NotifyPropertyChanged("TBPrice");
+
+                    fillSales();
+                    NotifyPropertyChanged("Sales");
                 }));
             }
         }
-        
+
+        private RelayCommand _refundSale;
+        public RelayCommand RefundSale
+        {
+            get
+            {
+                return _refundSale ??
+                (_refundSale = new RelayCommand(obj =>
+                {
+                    var requestSale = new RequestSale
+                    {
+                        Id = SelectedSale.Id,
+                        Refund = true
+                    };
+
+                    sharedClient.PutAsync("sales", new StringContent(JsonConvert.SerializeObject(requestSale), Encoding.UTF8));
+                    Thread.Sleep(50);
+
+                    fillSales();
+                    NotifyPropertyChanged("Sales");
+                }));
+            }
+        }
+
         private BasketItem _selectedBasketItem;
         public BasketItem SelectedBasketItem
         {
@@ -1173,6 +1204,35 @@ namespace fishing_store_app
                     _selectedBasketItem = value;
                     NotifyPropertyChanged();
                 }
+            }
+        }
+
+        private bool _isСashPay;
+        public bool IsСashPay
+        {
+            get { return _isСashPay; }
+            set
+            {
+                _isСashPay = value;
+                if (value) {
+                    PayType = "Наличными";
+                }
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool _isTranslationPay;
+        public bool IsTranslationPay
+        {
+            get { return _isTranslationPay; }
+            set
+            {
+                _isTranslationPay = value;
+                if (value)
+                {
+                    PayType = "Переводом";
+                }
+                NotifyPropertyChanged();
             }
         }
 

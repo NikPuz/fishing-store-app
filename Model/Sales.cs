@@ -16,6 +16,8 @@ namespace fishing_store_app.Model
         private int cashierId;
         private DateTime date;
         private List<SaleItem> saleItems;
+        private string payType;
+        private bool refund;
 
         public int Id
         {
@@ -60,6 +62,26 @@ namespace fishing_store_app.Model
             {
                 saleItems = value;
                 OnPropertyChanged("SaleItems");
+            }
+        }
+
+        public string PayType
+        {
+            get { return payType; }
+            set
+            {
+                payType = value;
+                OnPropertyChanged("PayType");
+            }
+        }
+
+        public bool Refund
+        {
+            get { return refund; }
+            set
+            {
+                refund = value;
+                OnPropertyChanged("Refund");
             }
         }
 
@@ -135,7 +157,10 @@ namespace fishing_store_app.Model
 
     public class RequestSale
     {
+        public int Id;
         public int CashierId;
         public ObservableCollection<BasketItem> SaleItems;
+        public string PayType;
+        public bool Refund;
     }
 }

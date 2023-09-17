@@ -16,7 +16,7 @@ namespace fishing_store_app.Model
         private int price;
         private string description;
         private int stock;
-        private Int64 barcode;
+        private string barcode;
         private string category;
         private string manufacturer;
 
@@ -65,7 +65,7 @@ namespace fishing_store_app.Model
                 OnPropertyChanged("Stock");
             }
         }
-        public Int64 Barcode
+        public string Barcode
         {
             get { return barcode; }
             set
@@ -108,7 +108,7 @@ namespace fishing_store_app.Model
         public int Price;
         public string Description;
         public int Stock;
-        public Int64 Barcode;
+        public string Barcode;
         public int CategoryId;
         public int ManufacturerId;
     }
